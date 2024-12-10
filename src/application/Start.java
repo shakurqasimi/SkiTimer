@@ -1,19 +1,12 @@
 package application;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalTime;
 
-public class Start implements Serializable {
-	private static final long serialVersionUID = 1L;
-
-
-	// Alla starttyper
+public class Start {
+	
+        // Alla starttyper
 	public enum StartType {
 		INDIVIDUAL_15,
 		INDIVIDUAL_30,
@@ -96,18 +89,6 @@ public class Start implements Serializable {
 
 		public List<LocalTime> getStartTimes() {
 			return startTimes;
-		}
-
-		public void saveToFile(String filePath) throws IOException {
-			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-				oos.writeObject(this);
-			}
-		}
-
-		public static Start loadFromFile(String filePath) throws IOException, ClassNotFoundException {
-			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-				return (Start) ois.readObject();
-			}
 		}
 
 }
