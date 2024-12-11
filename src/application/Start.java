@@ -33,12 +33,12 @@ public class Start {
 		startTimes.clear();
 		switch (startType) {
 		case INDIVIDUAL_15 -> {
-			for (int i = 0; i < 50; i++) { // räknar med 50 åkare
+			for (int i = 0; i < 10; i++) { // räknar med 10 åkare
 				startTimes.add(firstStartTime.plusSeconds(15 * i));
 			}
 		}
 		case INDIVIDUAL_30 -> {
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 10; i++) {
 				startTimes.add(firstStartTime.plusSeconds(30 * i));
 			}
 
