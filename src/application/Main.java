@@ -17,13 +17,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Skapa grundläggande layout
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(10));
+        VBox root = new VBox(10); //10 representerar mellanrummet (eller spacing) mellan de olika komponenterna (barnkomponenterna) som läggs till i VBox.
+        root.setPadding(new Insets(10));//Insets definierar marginaler (avstånd) mellan element i en layout. 
 
         // Kombobox för starttyp
-        Label startTypeLabel = new Label("Välj starttyp:");
-        ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();
-        startTypeComboBox.getItems().addAll(Start.StartType.values());
+        Label startTypeLabel = new Label("Välj starttyp:"); //Label: Används för att visa en textbeskrivning.
+        ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();//ComboBox (rullgardinsmeny)kombinerar funktionerna av en textfält och en drop-down lista.
+        startTypeComboBox.getItems().addAll(Start.StartType.values());//Start.stratType en enum, vilket innebär att det är en fördefinierad konstanter
         startTypeComboBox.setValue(Start.StartType.INDIVIDUAL_15); // Standardvärde
 
         // Textfält för första starttid
