@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package application;
 	
 import javafx.application.Application;
@@ -13,8 +14,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+=======
+>>>>>>> refs/remotes/origin/Linus
 
 
+<<<<<<< HEAD
 
 
 public class Main extends Application implements EventHandler<ActionEvent> {
@@ -71,4 +75,16 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 	
 	
 	
+=======
+public class Main extends Application {
+        Scene scene = new Scene(root, 400, 400);
+        primaryStage.setTitle("Starttidsgenerator");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+>>>>>>> refs/remotes/origin/Linus
 }
