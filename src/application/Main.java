@@ -19,6 +19,9 @@ public class Main extends Application {
         // Skapa grundläggande layout
         VBox root = new VBox(10); //10 representerar mellanrummet (eller spacing) mellan de olika komponenterna (barnkomponenterna) som läggs till i VBox.
         root.setPadding(new Insets(10));//Insets definierar marginaler (avstånd) mellan element i en layout. 
+        //Padding: Padding definierar det utrymme som finns mellan layoutens kant och dess innehåll (dvs. de kontroller eller komponenter som är inlagda i layouten).
+        //Genom att använda setPadding(), kan du skapa ett avstånd mellan innehållet och layoutens yttre kant.
+        //Insets: Metoden tar en instans av Insets som parameter, som definierar avståndet på alla fyra sidor av layouten (toppen, botten, vänster, höge
 
         // Kombobox för starttyp
         Label startTypeLabel = new Label("Välj starttyp:"); //Label: Används för att visa en textbeskrivning.
