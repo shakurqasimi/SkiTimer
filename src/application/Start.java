@@ -25,7 +25,7 @@ public class Start {
         this.startTimes = new ArrayList<>();
         this.timeGaps = new ArrayList<>();
         this.timeSimulator = new TimeSimulator(speedFactor);  // Skapar en TimeSimulator med en speed factor
-        this.firstStartTime = timeSimulator.getCurrentTimeMillis();  // Hämtar den aktuella tiden i millisekunder direkt från TimeSimulator
+        this.firstStartTime = timeSimulator.generateTime();  // Hämtar den aktuella tiden i millisekunder direkt från TimeSimulator
         generateStartTimes(); // Generera starttider baserat på starttypen
     }
 
@@ -35,27 +35,12 @@ public class Start {
         generateStartTimes();  // Uppdatera starttider när starttyp ändras
     }
 
-    // Metod för att konvertera millisekunder till hh:mm:ss
-    private String convertMillisToHHMMSS(long millis) {
-        long seconds = (millis / 1000) % 60;
-        long minutes = (millis / (1000 * 60)) % 60;
-        long hours = (millis / (1000 * 60 * 60)) % 24;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
 
-    // Metod för att konvertera hh:mm:ss till millisekunder
-    private long convertHHMMSSToMillis(String timeString) {
-        String[] parts = timeString.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1]);
-        int seconds = Integer.parseInt(parts[2]);
-        return (hours * 3600 + minutes * 60 + seconds) * 1000;  // Konvertera till millisekunder
-    }
 
     // Metod för att sätta starttid i hh:mm:ss format
     public void setFirstStartTime(String startTimeString) {
         // Om starttiden anges av användaren
-        this.firstStartTime = convertHHMMSSToMillis(startTimeString);  // Konvertera till millisekunder
+        this.firstStartTime = timeSimulator.generateTime();  // Konvertera till millisekunder
         generateStartTimes(); // Uppdatera starttider när starttiden ändras
     }
 
@@ -100,23 +85,14 @@ public class Start {
     }
 
     // Getter för att hämta starttider som en lista av hh:mm:ss-format
-    public List<String> getStartTimes() {
+    public List<String> getFormattedStartTimes() {
         List<String> formattedTimes = new ArrayList<>();
         for (Long time : startTimes) {
-            formattedTimes.add(convertMillisToHHMMSS(time));
+            formattedTimes.add(timeSimulator.formatTime(time));
         }
         return formattedTimes;
     }
 
-    // Getter för att hämta aktuell tid i hh:mm:ss format
-    public String getCurrentTime() {
-        return timeSimulator.getCurrentTime(); // Hämta tiden från TimeSimulator i hh:mm:ss format
-    }
-
-    // Getter för att hämta aktuell tid i millisekunder
-    public long getCurrentTimeMillis() {
-        return timeSimulator.getCurrentTimeMillis(); // Hämta tiden i millisekunder från TimeSimulator
-    }
 }
 
 
