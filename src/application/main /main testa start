@@ -1,0 +1,105 @@
+package application;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main extends Application {
+
+    private Start start;
+
+    @Override
+    public void start(Stage primaryStage) {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(15));
+
+       
+        ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();
+        startTypeComboBox.getItems().addAll(Start.StartType.values());
+        startTypeComboBox.setValue(Start.StartType.INDIVIDUAL_15); 
+
+       
+        TextField startTimeField = new TextField();
+        startTimeField.setPromptText("Ange starttid (t.ex. 10:00:00)");
+
+        
+        Button generateButton = new Button("Generera Starttider");
+
+       
+        TextArea resultArea = new TextArea();
+        resultArea.setEditable(false);
+
+        
+        VBox pursuitBox = new VBox(5);
+        pursuitBox.setPadding(new Insets(5));
+        TextField timeGapsField = new TextField();
+        timeGapsField.setPromptText("Tidsavstånd för jaktstart (t.ex. 10,20,30)");
+        pursuitBox.getChildren().addAll(new Label("Tidsavstånd för Jaktstart:"), timeGapsField);
+        pursuitBox.setVisible(false);
+
+        
+        startTypeComboBox.setOnAction(event -> {
+            pursuitBox.setVisible(startTypeComboBox.getValue() == Start.StartType.PURSUIT_START);
+        });
+
+        
+        generateButton.setOnAction(event -> {
+            try {
+               
+                Start.StartType selectedType = startTypeComboBox.getValue();
+                start = new Start(selectedType, 1.0); 
+
+                
+                String startTime = startTimeField.getText();
+                if (!startTime.isEmpty()) {
+                    start.setFirstStartTime(startTime);
+                }
+
+                
+                if (selectedType == Start.StartType.PURSUIT_START) {
+                    String[] gaps = timeGapsField.getText().split(",");
+                    List<Integer> timeGaps = new ArrayList<>();
+                    for (String gap : gaps) {
+                        timeGaps.add(Integer.parseInt(gap.trim()));
+                    }
+                    start.setTimeGaps(timeGaps);
+                }
+
+                
+                List<String> startTimes = start.getFormattedStartTimes();  
+                resultArea.setText(String.join("\n", startTimes)); 
+
+            } catch (Exception e) {
+                resultArea.setText("Fel: " + e.getMessage());
+            }
+        });
+
+        
+        root.getChildren().addAll(
+                new Label("Välj Starttyp:"),
+                startTypeComboBox,
+                new Label("Ange Första Starttid (hh:mm:ss):"),
+                startTimeField,
+                pursuitBox,
+                generateButton,
+                new Label("Genererade Starttider:"),
+                resultArea
+        );
+
+     
+        Scene scene = new Scene(root, 400, 400);
+        primaryStage.setTitle("Starttidshantering");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
