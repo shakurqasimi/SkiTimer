@@ -17,17 +17,14 @@ public class Result {
         this.finishTime = null;
     }
 
-    // Lägg till mellantid
     public void addSplitTime(LocalTime splitTime) {
         splitTimes.add(splitTime);
     }
 
-    // Registrera målgångstid
     public void setFinishTime(LocalTime finishTime) {
         this.finishTime = finishTime;
     }
 
-    // Beräkna total åktid fram till en viss tidpunkt
     public String getCurrentRaceTime(LocalTime currentTime) {
         if (startTime == null) {
             return "Starttid saknas!";
@@ -36,7 +33,6 @@ public class Result {
         return formatTime(elapsedSeconds);
     }
 
-    // Hämta åktid vid målgång
     public String getFinalRaceTime() {
         if (finishTime == null || startTime == null) {
             return "Tid ej tillgänglig.";
@@ -45,7 +41,6 @@ public class Result {
         return formatTime(elapsedSeconds);
     }
 
-    // Hjälpmetod för att formatera tid i HH:MM:SS-format
     private String formatTime(long totalSeconds) {
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;
