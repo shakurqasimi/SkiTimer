@@ -4,18 +4,20 @@ public class Skier {
 	private int Startnumber;
 	private double position;
 	private double speed;
-	private double previousTime;
+	private long startTime;
+	
 	TimeSimulator timeSimulator = new TimeSimulator(20);
 	speedSimulator speedSimulator = new speedSimulator();
 
 	public Skier() {
 	}
 
-	public Skier(int startnumber, double position, double speed, double previousTime) {
+	public Skier(int startnumber, double position, double speed, long startTime) {
 		Startnumber = startnumber;
 		this.position = 0;
 		this.speed = speed;
-		this.previousTime = timeSimulator.generateTime();
+		this.startTime = startTime;
+		//Ska skötas av startklassen senare
 	}
 
 	public int getStartnumber() {
@@ -42,19 +44,25 @@ public class Skier {
 		this.speed = speed;
 	}
 
-	public double getPreviousTime() {
-		return previousTime;
+	public double getStartTime() {
+		return startTime;
 	}
 
-	public void setPreviousTime(double previousTime) {
-		this.previousTime = previousTime;
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
 	}
 
 	public void move(long currentTime) {
-
-		double deltaTime = (currentTime - previousTime);
+		double deltaTime = (currentTime - startTime);
+		if (currentTime > startTime) {
 		position += speed * (deltaTime / 1000);
-		previousTime = currentTime;
+		startTime = currentTime;
+		}
+	}
+	
+	public long getRaceTime(long currentTime) {
+		long raceTime = currentTime - startTime;
+		return raceTime;
 	}
 
 }
