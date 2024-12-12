@@ -1,13 +1,11 @@
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Result {
     private int athleteNumber;
     private LocalTime startTime;
-    private List<LocalTime> splitTimes;
+    private List<CheckpointTime> splitTimes;
     private LocalTime finishTime;
 
     public Result(int athleteNumber, LocalTime startTime) {
@@ -17,8 +15,8 @@ public class Result {
         this.finishTime = null;
     }
 
-    public void addSplitTime(LocalTime splitTime) {
-        splitTimes.add(splitTime);
+    public void addSplitTime(int checkpoint, LocalTime splitTime) {
+        splitTimes.add(new CheckpointTime(checkpoint,splittime));
     }
 
     public void setFinishTime(LocalTime finishTime) {
@@ -52,7 +50,7 @@ public class Result {
         return athleteNumber;
     }
 
-    public List<LocalTime> getSplitTimes() {
+    public List<CheckpointTime> getSplitTimes() {
         return splitTimes;
     }
 
@@ -63,4 +61,27 @@ public class Result {
     public LocalTime getFinishTime() {
         return finishTime;
     }
+    public static class CheckpointTime {
+        private int checkpointDistance;
+        private LocaleTime time;
+
+        public CheckpointTime (int checkpointDistance, LocalTime time){
+            this.checkpointDistance = checkpointDistance;
+            this.time = time;
+        }
+
+        public int getCheckpointDistance() {
+            return checkpointDistance;
+        }
+
+        public LocalTime getTime() {
+            return time;
+        }
+
+        @Override
+        public String toString() {
+            return "Checkpoint " + checkpointDistance + " m: " + time.toString();
+        }
+    }
+
 }
