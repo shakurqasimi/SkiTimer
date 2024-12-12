@@ -15,6 +15,8 @@ public class RaceController extends Application {
         Label startnummerLabel = new Label("Välj åkare:");
         TextField startnummerInput = new TextField();
         startnummerInput.setPromptText("Skriv in startnummer");
+        
+        Button startBtn = new Button ("Sart");
 
         Label aktuellTidLabel = new Label("Ledartid (HH:mm:ss):");
         TextField ledartidInput = new TextField();
@@ -43,7 +45,7 @@ public class RaceController extends Application {
         });
 
         // Layout
-        VBox root = new VBox(10, startnummerLabel, startnummerInput, aktuellTidLabel, ledartidInput, 
+        VBox root = new VBox(10, startnummerLabel, startnummerInput, startBtn, aktuellTidLabel, ledartidInput, 
                 startTypeLabel, startTypeComboBox, räknaUtButton, resultatArea);
         root.setPadding(new Insets(10));
 
