@@ -53,6 +53,9 @@ public class RaceController extends Application {
                 startTypeLabel, startTypeComboBox, räknaUtButton, resultatArea);
         root.setPadding(new Insets(10));
 
+	startnummerInput.setPrefWidth(200);
+	ledartidInput.setPrefWidth(200);
+
         // Skapa scen och visa
         primaryStage.setTitle("Mellantidsräknare");
         primaryStage.setScene(new Scene(root, 400, 500));
