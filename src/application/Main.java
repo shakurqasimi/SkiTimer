@@ -23,9 +23,9 @@ import java.util.List;
 public class Main extends Application implements EventHandler<ActionEvent> {
 
 	static speedSimulator speedSimulator = new speedSimulator();
-	static TimeSimulator timeSimulator = new TimeSimulator(1);
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
+	private boolean raceHasStarted = false;
 
 	
 	private Start start;
@@ -34,7 +34,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 	public void start(Stage primaryStage) throws InterruptedException {
 		
 		
-		
+
 		List<Skier> skiers = new ArrayList<Skier>();
 
 		Skier skier1 = new Skier(1, 0, speedSimulator.generateSpeed(0), 0);
@@ -91,30 +91,23 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		generateButton.setOnAction(event -> {
 			try {
+				TimeSimulator timeSimulator = new TimeSimulator(1);
+
+				long currentTime = timeSimulator.generateTime();
 
 				Start.StartType selectedType = startTypeComboBox.getValue();
-				start = new Start(selectedType, 1.0, skiers);
-				System.out.println("test");
-				boolean raceHasStarted = false;
-				raceHasStarted = true;
-				while (raceHasStarted) {
-
-					for (Skier skier : skiers) {
-						skier.move(timeSimulator.generateTime());
-						System.out.println(
-								"Åkare: " + skier.getStartnumber() + " har åkt " + df.format(skier.getPosition()) + " meter");
-						// Inom denna loop updateras åkarnas position beroende på tid
-					}
-
-					Thread.sleep(2000);
-					// Begränsar hur snabbt loopen körs
-				}
-
+				start = new Start(selectedType, 1, skiers, currentTime);				
+				
+				Race race = new Race(start, skiers, currentTime); 
+				Thread raceThread = new Thread(race);
+				raceThread.setDaemon(true);
+				raceThread.start();
+				
 				String startTime = startTimeField.getText();
 				
 				
 				if (!startTime.isEmpty()) {
-					start.setFirstStartTime(startTime, skiers);
+					start.setFirstStartTime(startTime, skiers, timeSimulator.generateTime());
 				}
 
 				if (selectedType == Start.StartType.PURSUIT_START) {
@@ -123,7 +116,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 					for (String gap : gaps) {
 						timeGaps.add(Integer.parseInt(gap.trim()));
 					}
-					start.setTimeGaps(timeGaps, skiers);
+					start.setTimeGaps(timeGaps, skiers, timeSimulator.generateTime());
 				}
 
 				List<String> startTimes = start.getFormattedStartTimes();

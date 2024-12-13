@@ -21,39 +21,40 @@ public class Start {
     private List<Integer> timeGaps; // Lista för tidsavstånd för jaktstart
 
     // Konstruktor 
-    public Start(StartType startType, double speedFactor, List<Skier> skiers) {
+    public Start(StartType startType, double speedFactor, List<Skier> skiers, long currentTime) {
         this.startType = startType;
         this.startTimes = new ArrayList<>();
         this.timeGaps = new ArrayList<>();
         this.timeSimulator = new TimeSimulator(speedFactor);  // Skapar en TimeSimulator med en speed factor
         this.firstStartTime = timeSimulator.generateTime();  // Hämtar den aktuella tiden i millisekunder direkt från TimeSimulator
-        generateStartTimes(skiers); // Generera starttider baserat på starttypen
+        generateStartTimes(skiers, currentTime); // Generera starttider baserat på starttypen
     }
 
     // Metod för att sätta starttyp
-    public void setStartType(StartType startType, List<Skier> skiers) {
+    public void setStartType(StartType startType, List<Skier> skiers, long currentTime) {
         this.startType = startType;
-        generateStartTimes(skiers);  // Uppdatera starttider när starttyp ändras
+        generateStartTimes(skiers, currentTime);  // Uppdatera starttider när starttyp ändras
     }
 
 
 
     // Metod för att sätta starttid i hh:mm:ss format
-    public void setFirstStartTime(String startTimeString, List<Skier> skiers) {
+    public void setFirstStartTime(String startTimeString, List<Skier> skiers, long currentTime) {
         // Om starttiden anges av användaren
-        this.firstStartTime = timeSimulator.generateTime();  // Konvertera till millisekunder
-        generateStartTimes(skiers); // Uppdatera starttider när starttiden ändras
+        this.firstStartTime = timeSimulator.generateTime();
+        generateStartTimes(skiers, currentTime); // Uppdatera starttider när starttiden ändras
     }
 
     // Metod för att generera starttider baserat på vald starttyp
-    private void generateStartTimes(List<Skier> skiers) {
+    private void generateStartTimes(List<Skier> skiers, long currentTime) {
+    	
     	int i = 0;
         startTimes.clear(); 
 
         switch (startType) {
             case INDIVIDUAL_15:
                 for (Skier skier : skiers) {
-                	long startTime = firstStartTime + (15 * i * 1000);
+                	long startTime = currentTime + (15 * i * 1000);
                 	skier.setStartTime(startTime);
                     startTimes.add(startTime); 
                     i++;
@@ -61,15 +62,15 @@ public class Start {
                 break;
             case INDIVIDUAL_30:
             	for (Skier skier : skiers) {
-            		long startTime = firstStartTime + (30 * i *  1000); 
+            		long startTime = currentTime + (30 * i *  1000); 
                 	skier.setStartTime(startTime);
-                    startTimes.add(startTime); 
+                    startTimes.add(startTime + (30 * i *  1000)); 
                     i++;
                 }
                 break;
             case MASS_START:
             for (Skier skier : skiers) {
-                	skier.setStartTime(firstStartTime);
+                	skier.setStartTime(currentTime);
             }
                 startTimes.add(firstStartTime); 
                 break;
@@ -77,7 +78,6 @@ public class Start {
                 if (timeGaps.isEmpty()) {
                     throw new IllegalStateException("Det finns inget tidsavstånd för jaktstart än"); // Om inga tidsavstånd är satta för jaktstart
                 }
-                long currentTime = firstStartTime;
                 for (int gap : timeGaps) {
                     startTimes.add(currentTime);  // Lägg till starttiden för varje åkare
                     currentTime += gap * 1000;  // Lägg till tidsavstånd för nästa åkare (gap i sekunder)
@@ -87,12 +87,12 @@ public class Start {
     }
 
     // Metod för att sätta tidsavstånd för jaktstart (endast för PURSUIT_START)
-    public void setTimeGaps(List<Integer> timeGaps, List<Skier> skiers) {
+    public void setTimeGaps(List<Integer> timeGaps, List<Skier> skiers, long currentTime) {
         if (startType != StartType.PURSUIT_START) {
             throw new IllegalArgumentException("Tidsavstånd kan endast anges för jaktstart"); // Kasta ett undantag om starttypen inte är jaktstart
         }
         this.timeGaps = timeGaps;
-        generateStartTimes(skiers); // Uppdatera starttider när tidsavstånd sätts
+        generateStartTimes(skiers, currentTime); // Uppdatera starttider när tidsavstånd sätts
     }
 
     // Getter för att hämta starttider som en lista av hh:mm:ss-format
