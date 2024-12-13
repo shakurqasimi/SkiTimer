@@ -17,12 +17,16 @@ public class RaceController extends Application {
         startnummerInput.setPromptText("Skriv in startnummer");
         
         Button startBtn = new Button ("Sart");
+        startBtn.setFont(Font.font("Arial", FontWeight.BOLD,14));
+		startBtn.setStyle("-fx-background-color:#4CC5E4");
 
         Label aktuellTidLabel = new Label("Ledartid (HH:mm:ss):");
         TextField ledartidInput = new TextField();
         ledartidInput.setPromptText("Exempel: 08:00:00");
 
         Button räknaUtButton = new Button("Räkna ut");
+        räknaUtButton.setFont(Font.font("Arial", FontWeight.BOLD,14));
+		räknaUtButton.setStyle("-fx-background-color:#4CC5E4");
         TextArea resultatArea = new TextArea();
         resultatArea.setEditable(false);
 
@@ -51,7 +55,7 @@ public class RaceController extends Application {
 
         // Skapa scen och visa
         primaryStage.setTitle("Mellantidsräknare");
-        primaryStage.setScene(new Scene(root, 400, 300));
+        primaryStage.setScene(new Scene(root, 400, 500));
         primaryStage.show();
     }
 
