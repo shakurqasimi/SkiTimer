@@ -1,3 +1,4 @@
+
 package application;
 
 import javafx.application.Application;
@@ -25,28 +26,24 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 	static speedSimulator speedSimulator = new speedSimulator();
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
-	private boolean raceHasStarted = false;
 
-	
 	private Start start;
 
 	@Override
 	public void start(Stage primaryStage) throws InterruptedException {
-		
-		
 
 		List<Skier> skiers = new ArrayList<Skier>();
 
-		Skier skier1 = new Skier(1, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier2 = new Skier(2, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier3 = new Skier(3, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier4 = new Skier(4, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier5 = new Skier(5, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier6 = new Skier(6, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier7 = new Skier(7, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier8 = new Skier(8, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier9 = new Skier(9, 0, speedSimulator.generateSpeed(0), 0);
-		Skier skier10 = new Skier(10, 0, speedSimulator.generateSpeed(0), 0);
+		Skier skier1 = new Skier(1, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier2 = new Skier(2, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier3 = new Skier(3, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier4 = new Skier(4, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier5 = new Skier(5, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier6 = new Skier(6, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier7 = new Skier(7, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier8 = new Skier(8, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier9 = new Skier(9, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier10 = new Skier(10, 0, speedSimulator.generateSpeed(0), 0, 0);
 
 		// Åkarobject: Startnummer, position, hastighet, starttid
 
@@ -61,8 +58,6 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		skiers.add(skier9);
 		skiers.add(skier10);
 
-
-		
 		VBox root = new VBox(10);
 		root.setPadding(new Insets(15));
 
@@ -75,7 +70,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		Button generateButton = new Button("Generera Starttider");
 
-		TextArea resultArea = new TextArea();
+		TextArea resultArea = new TextArea(); 
 		resultArea.setEditable(false);
 
 		VBox pursuitBox = new VBox(5);
@@ -91,23 +86,22 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		generateButton.setOnAction(event -> {
 			try {
-				TimeSimulator timeSimulator = new TimeSimulator(1);
 
-				long currentTime = timeSimulator.generateTime();
+				TimeSimulator timeSimulator = new TimeSimulator();
+
 
 				Start.StartType selectedType = startTypeComboBox.getValue();
-				start = new Start(selectedType, 1, skiers, currentTime);				
-				
-				Race race = new Race(start, skiers, currentTime); 
+				start = new Start(selectedType, skiers);
+
+				Race race = new Race(skiers, 200);
 				Thread raceThread = new Thread(race);
 				raceThread.setDaemon(true);
 				raceThread.start();
-				
+
 				String startTime = startTimeField.getText();
-				
-				
+
 				if (!startTime.isEmpty()) {
-					start.setFirstStartTime(startTime, skiers, timeSimulator.generateTime());
+					start.setFirstStartTime(startTime, skiers);
 				}
 
 				if (selectedType == Start.StartType.PURSUIT_START) {
@@ -137,19 +131,15 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		primaryStage.show();
 	}
 
-
 	public static void main(String[] args) throws InterruptedException {
 		launch(args);
 
-
 	}
-
 
 	@Override
 	public void handle(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		
-	}
 
+	}
 
 }

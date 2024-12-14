@@ -1,23 +1,27 @@
 package application;
 
+import java.util.List;
+
 public class Skier {
 	private int Startnumber;
 	private double position;
 	private double speed;
 	private long startTime;
+	private long previousTime;
+	private long raceTime;
 	
-	TimeSimulator timeSimulator = new TimeSimulator(20);
+	TimeSimulator timeSimulator = new TimeSimulator(1);
 	speedSimulator speedSimulator = new speedSimulator();
 
 	public Skier() {
 	}
 
-	public Skier(int startnumber, double position, double speed, long startTime) {
+	public Skier(int startnumber, double position, double speed, long startTime, long raceTime) {
 		Startnumber = startnumber;
 		this.position = 0;
 		this.speed = speed;
 		this.startTime = startTime;
-		//Ska skötas av startklassen senare
+		this.raceTime = raceTime;
 	}
 
 	public int getStartnumber() {
@@ -44,7 +48,7 @@ public class Skier {
 		this.speed = speed;
 	}
 
-	public double getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 
@@ -52,16 +56,29 @@ public class Skier {
 		this.startTime = startTime;
 	}
 
+	public long getPreviousTime() {
+		return previousTime;
+	}
+
+	public void setPreviousTime(long previousTime) {
+		this.previousTime = previousTime;
+	}
+	
+	
+
 	public void move(long currentTime) {
-		double deltaTime = (currentTime - startTime);
-		if (currentTime > startTime) {
+		long deltaTime = currentTime - previousTime;
+		if (currentTime >= startTime) {
 		position += speed * (deltaTime / 1000);
-		startTime = currentTime;
+		previousTime = currentTime;
 		}
+		//if satsen säkerställer att åkaren bara kan röra sig om de har startat
 	}
 	
 	public long getRaceTime(long currentTime) {
-		long raceTime = currentTime - startTime;
+		if (currentTime >= startTime) {
+		raceTime = currentTime - startTime;
+		}
 		return raceTime;
 	}
 

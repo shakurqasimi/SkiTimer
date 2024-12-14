@@ -14,6 +14,10 @@ public TimeSimulator(double speedFactor){
 	this.speedFactor = speedFactor;
 }
 
+public TimeSimulator(){
+	this.startingTime = System.currentTimeMillis();
+}
+
 	public long generateTime() {
 		long elapsedTime = System.currentTimeMillis() - startingTime; 
 		long time = (long) (elapsedTime * speedFactor);
