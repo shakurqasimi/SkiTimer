@@ -78,6 +78,13 @@ public class RaceController extends Application {
     private void setupMållinje() {
         mållinje.setStroke(Color.RED);  // Sätt mållinjen till röd
         mållinje.setStrokeWidth(3);     // Sätt linjens tjocklek
+            
+     //Koppla en metod till knappen som sätter starttiden
+     //startBtn.setOnAction(e -> {
+     //long currentTime = System.currentTimeMillis();  // Hämta nuvarande tid
+     //skier.setStartTime(currentTime);  // Sätt starttid i Skier-objektet
+     //startnummerLabel.setText("Starttid: " + skier.getStartTime()+ ", Hastighet " + skier.getSpeed());  // Uppdatera UI:t med starttiden
+     // });
     }
 
     // Skapa och konfigurera checkpointen
