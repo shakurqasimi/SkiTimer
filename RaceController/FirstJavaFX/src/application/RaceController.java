@@ -15,7 +15,7 @@ public class RaceController extends Application {
 
     private Button startBtn = new Button("Start");
     private Button räknaUtButton = new Button("Räkna ut");
-    private Line skidbana = new Line(50, 100, 50, 100);
+    private Line skidbana = new Line(50, 100, 50, 100); //representera skidbanan en visuell representation av skidbanans längd.
     private Line mållinje = new Line();
     private Slider banlängdSlider = new Slider(100, 20000, 2000);
     private Label skidbanaLabel = new Label("Skidbanans längd: " + (int) banlängdSlider.getValue() + " meter");
