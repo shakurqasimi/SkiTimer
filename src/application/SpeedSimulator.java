@@ -2,7 +2,7 @@ package application;
 
 import java.util.Random;
 
-public class speedSimulator {
+public class SpeedSimulator {
 	
 	public double generateSpeed(double trackLength) {
 

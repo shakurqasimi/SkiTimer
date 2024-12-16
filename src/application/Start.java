@@ -65,7 +65,7 @@ public class Start {
             		long startTime = 30 * i *  1000; 
                 	skier.setStartTime(startTime);
                 	skier.setPreviousTime(startTime);
-                    startTimes.add(startTime + (30 * i *  1000)); 
+                    startTimes.add(startTime); 
                     i++;
                 }
                 break;
@@ -89,7 +89,7 @@ public class Start {
     }
 
     // Metod för att sätta tidsavstånd för jaktstart (endast för PURSUIT_START)
-    public void setTimeGaps(List<Integer> timeGaps, List<Skier> skiers, long currentTime) {
+    public void setTimeGaps(List<Integer> timeGaps, List<Skier> skiers) {
         if (startType != StartType.PURSUIT_START) {
             throw new IllegalArgumentException("Tidsavstånd kan endast anges för jaktstart"); // Kasta ett undantag om starttypen inte är jaktstart
         }

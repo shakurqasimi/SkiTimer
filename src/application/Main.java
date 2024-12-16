@@ -2,6 +2,7 @@
 package application;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -20,10 +21,11 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Main extends Application implements EventHandler<ActionEvent> {
 
-	static speedSimulator speedSimulator = new speedSimulator();
+	static SpeedSimulator speedSimulator = new SpeedSimulator();
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -32,20 +34,26 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 	@Override
 	public void start(Stage primaryStage) throws InterruptedException {
 
+		List<Double> splitPointPositions = new ArrayList<Double>(); 
+		splitPointPositions.add(100.0); //Sätt checkpoints inom banan
+		SkiTrack skiTrack = new SkiTrack();
+		skiTrack.setTrackLength(1000);
+		skiTrack.setSplitPoints(splitPointPositions);
+		
 		List<Skier> skiers = new ArrayList<Skier>();
 
-		Skier skier1 = new Skier(1, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier2 = new Skier(2, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier3 = new Skier(3, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier4 = new Skier(4, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier5 = new Skier(5, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier6 = new Skier(6, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier7 = new Skier(7, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier8 = new Skier(8, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier9 = new Skier(9, 0, speedSimulator.generateSpeed(0), 0, 0);
-		Skier skier10 = new Skier(10, 0, speedSimulator.generateSpeed(0), 0, 0);
+		Skier skier1 = new Skier(1, 12, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier2 = new Skier(2, 23, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier3 = new Skier(3, 83, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier4 = new Skier(4, 77, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier5 = new Skier(5, 91, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier6 = new Skier(6, 14, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier7 = new Skier(7, 22, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier8 = new Skier(8, 54, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier9 = new Skier(9, 38, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier10 = new Skier(10, 46, speedSimulator.generateSpeed(0), skiTrack);
 
-		// Åkarobject: Startnummer, position, hastighet, starttid
+		// Åkarobject: Startnummer, åkarnummer, hastighet
 
 		skiers.add(skier1);
 		skiers.add(skier2);
@@ -86,14 +94,12 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		generateButton.setOnAction(event -> {
 			try {
-
-				TimeSimulator timeSimulator = new TimeSimulator();
-
+				
 
 				Start.StartType selectedType = startTypeComboBox.getValue();
 				start = new Start(selectedType, skiers);
 
-				Race race = new Race(skiers, 200);
+				Race race = new Race(skiers, 1);
 				Thread raceThread = new Thread(race);
 				raceThread.setDaemon(true);
 				raceThread.start();
@@ -110,7 +116,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 					for (String gap : gaps) {
 						timeGaps.add(Integer.parseInt(gap.trim()));
 					}
-					start.setTimeGaps(timeGaps, skiers, timeSimulator.generateTime());
+					start.setTimeGaps(timeGaps, skiers);
 				}
 
 				List<String> startTimes = start.getFormattedStartTimes();
@@ -129,6 +135,14 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		primaryStage.setTitle("Starttidshantering");
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		
+        primaryStage.setOnCloseRequest(event -> { 
+        	System.out.println("Stänger av");
+        	Platform.exit();
+        	System.exit(0);
+        	//Stänger alla trådar när fönstret stängs
+        });
+
 	}
 
 	public static void main(String[] args) throws InterruptedException {

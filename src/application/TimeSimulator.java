@@ -6,7 +6,6 @@ public class TimeSimulator {
 	private long startingTime;
 	//starttid i realtid
 	private double speedFactor;
-
 	//med hur många gånger snabbt tiden ska gå, så om faktorn är 1 så körs verkligt tidsflöde
 
 public TimeSimulator(double speedFactor){
@@ -15,13 +14,11 @@ public TimeSimulator(double speedFactor){
 }
 
 public TimeSimulator(){
-	this.startingTime = System.currentTimeMillis();
 }
 
 	public long generateTime() {
 		long elapsedTime = System.currentTimeMillis() - startingTime; 
 		long time = (long) (elapsedTime * speedFactor);
-		
 		return time;
 		//Rå tid för användning av uträkningar, koppla denna till åkare
 	}

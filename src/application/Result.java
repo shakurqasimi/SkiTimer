@@ -1,73 +1,70 @@
 package application;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Result {
-    private int athleteNumber;
-    private LocalTime startTime;
-    private List<LocalTime> splitTimes;
-    private LocalTime finishTime;
 
-    public Result(int athleteNumber, LocalTime startTime) {
-        this.athleteNumber = athleteNumber;
-        this.startTime = startTime;
-        this.splitTimes = new ArrayList<>();
-        this.finishTime = null;
+    private Map<Integer, Long> splitTimes; 
+    private Map<Integer, Long> finishTimes; 
+    private long raceStartTime; 
+
+    public Result(long raceStartTime) {
+        this.splitTimes = new HashMap<>();
+        this.finishTimes = new HashMap<>();
     }
 
-    // Lägg till mellantid
-    public void addSplitTime(LocalTime splitTime) {
-        splitTimes.add(splitTime);
-    }
-
-    // Registrera målgångstid
-    public void setFinishTime(LocalTime finishTime) {
-        this.finishTime = finishTime;
-    }
-
-    // Beräkna total åktid fram till en viss tidpunkt
-    public String getCurrentRaceTime(LocalTime currentTime) {
-        if (startTime == null) {
-            return "Starttid saknas!";
+   // mellantid (100 m)
+    public void registerSplitTime(int skierNumber, long raceTime) {
+        if (!splitTimes.containsKey(skierNumber)) {
+            splitTimes.put(skierNumber, raceTime);
+            System.out.println("Åkare " + skierNumber + " registrerade mellantid vid 100 m: " + formatTime(raceTime));
         }
-        long elapsedSeconds = java.time.Duration.between(startTime, currentTime).getSeconds();
-        return formatTime(elapsedSeconds);
     }
 
-    // Hämta åktid vid målgång
-    public String getFinalRaceTime() {
-        if (finishTime == null || startTime == null) {
-            return "Tid ej tillgänglig.";
+    //  sluttid (20 km)
+    public void registerFinishTime(int skierNumber, long currentTime) {
+        if (!finishTimes.containsKey(skierNumber)) {
+            long elapsedTime = currentTime - raceStartTime;
+            finishTimes.put(skierNumber, elapsedTime);
+            System.out.println("Åkare " + skierNumber + " gick i mål: " + formatTime(elapsedTime));
         }
-        long elapsedSeconds = java.time.Duration.between(startTime, finishTime).getSeconds();
-        return formatTime(elapsedSeconds);
     }
 
-    // Hjälpmetod för att formatera tid i HH:MM:SS-format
-    private String formatTime(long totalSeconds) {
-        long hours = totalSeconds / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
+     
+    public String getSplitTime(int skierNumber) {
+        if (splitTimes.containsKey(skierNumber)) {
+            return formatTime(splitTimes.get(skierNumber));
+        } else {
+            return "Mellantid saknas för åkare " + skierNumber;
+        }
+    }
+
+    
+    public String getFinishTime(int skierNumber) {
+        if (finishTimes.containsKey(skierNumber)) {
+            return formatTime(finishTimes.get(skierNumber));
+        } else {
+            return "Sluttid saknas för åkare " + skierNumber;
+        }
+    }
+
+    //  slutresultat 
+    public void displayFinalResults() {
+        System.out.println("Slutresultat (sorterat efter sluttid):");
+        finishTimes.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(entry -> System.out.println(
+                        "Åkare " + entry.getKey() + ": " + formatTime(entry.getValue())));
+    }
+
+    
+    private String formatTime(long timeMillis) {
+        long hours = timeMillis / 3600000;
+        long minutes = (timeMillis % 3600000) / 60000;
+        long seconds = (timeMillis % 60000) / 1000;
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    public int getAthleteNumber() {
-        return athleteNumber;
-    }
-
-    public List<LocalTime> getSplitTimes() {
-        return splitTimes;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalTime getFinishTime() {
-        return finishTime;
     }
 }
