@@ -13,38 +13,33 @@ import javafx.stage.Stage;
 
 public class RaceController extends Application {
 
-    // GUI-komponenter
     private Button startBtn = new Button("Start");
     private Button räknaUtButton = new Button("Räkna ut");
-    private TextArea resultatArea = new TextArea();
-    private TextField startnummerInput = new TextField();
-    private TextField ledartidInput = new TextField();
-    private Slider banlängdSlider = new Slider(100, 20000, 2000); // Slider för 100 till 20000 meter, standard 2000 meter
-    private Label skidbanaLabel = new Label();
     private Line skidbana = new Line(50, 100, 50, 100);
     private Line mållinje = new Line();
-    private Line checkpoint = new Line(); // Ny line för checkpoint på 5000 meter
+    private Slider banlängdSlider = new Slider(100, 20000, 2000);
+    private Label skidbanaLabel = new Label("Skidbanans längd: " + (int) banlängdSlider.getValue() + " meter");
+    private TextArea resultatArea = new TextArea();
+
+    // Skapa en instans av Skier-klassen
+    // Skier skier = new Skier(1, 15.5); // Startnummer 1 och hastighet 15.5
 
     @Override
     public void start(Stage primaryStage) {
-
         // Skapa GUI-komponenter
-        setupStartnummerInput();
-        setupLedartidInput();
-        setupBanlängdSlider();
-        setupMållinje();
-        setupCheckpoint();
-        setupButtons();
-        
+        Label startnummerLabel = new Label("Välj åkare:");
+        TextField startnummerInput = createTextField("Skriv in startnummer");
+        Label aktuellTidLabel = new Label("Ledartid (HH:mm:ss):");
+        TextField ledartidInput = createTextField("Exempel: 08:00:00");
+
+        // Uppdatera banans längd och mållinjens position när slidern ändras
+        updateBanlängdSlider();
+
+        // Lägg till funktionalitet till knappar
+        setupButtons(startnummerLabel, startnummerInput, ledartidInput);
+
         // Layout
-        VBox root = new VBox(10,
-                createLabel("Välj åkare:"), startnummerInput,
-                startBtn, createLabel("Ledartid (HH:mm:ss):"), ledartidInput,
-                createLabel("Skidbanans längd:"), skidbanaLabel,
-                banlängdSlider, skidbana, mållinje, checkpoint,
-                räknaUtButton, resultatArea
-        );
-        root.setPadding(new Insets(10));
+        VBox root = createLayout(startnummerLabel, startnummerInput, aktuellTidLabel, ledartidInput);
 
         // Skapa scen och visa
         primaryStage.setTitle("Mellantidsräknare");
@@ -52,55 +47,35 @@ public class RaceController extends Application {
         primaryStage.show();
     }
 
-    // Skapa och konfigurera komponenterna för startnummer
-    private void setupStartnummerInput() {
-        startnummerInput.setPromptText("Skriv in startnummer");
-        startnummerInput.setPrefWidth(200);
+    private TextField createTextField(String promptText) {
+        TextField textField = new TextField();
+        textField.setPromptText(promptText);
+        textField.setPrefWidth(200);
+        return textField;
     }
 
-    // Skapa och konfigurera komponenterna för ledartid
-    private void setupLedartidInput() {
-        ledartidInput.setPromptText("Exempel: 08:00:00");
-        ledartidInput.setPrefWidth(200);
-    }
-
-    // Skapa och konfigurera banlängdslider och uppdatera skidbana, mållinje och checkpoint
-    private void setupBanlängdSlider() {
-        skidbanaLabel.setText("Skidbanans längd: " + (int) banlängdSlider.getValue() + " meter");
+    private void updateBanlängdSlider() {
         banlängdSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-            updateSkidbanaAndMållinje(newValue.doubleValue());
-            updateCheckpoint(newValue.doubleValue());
-            skidbanaLabel.setText("Skidbanans längd: " + (int) newValue.doubleValue() + " meter");
+            double newLength = newValue.doubleValue();
+            skidbana.setEndX(50 + newLength); // Uppdatera slutpunkten för skidbanan
+            skidbana.setStartX(50 + newLength); // Uppdatera mållinjens startpunkt
+            skidbana.setEndX(50 + newLength);   // Uppdatera mållinjens slutpunkt
+            skidbanaLabel.setText("Skidbanans längd: " + (int) newLength + " meter");
         });
     }
 
-    // Skapa och konfigurera mållinjen
-    private void setupMållinje() {
-        mållinje.setStroke(Color.RED);  // Sätt mållinjen till röd
-        mållinje.setStrokeWidth(3);     // Sätt linjens tjocklek
-            
-     //Koppla en metod till knappen som sätter starttiden
-     //startBtn.setOnAction(e -> {
-     //long currentTime = System.currentTimeMillis();  // Hämta nuvarande tid
-     //skier.setStartTime(currentTime);  // Sätt starttid i Skier-objektet
-     //startnummerLabel.setText("Starttid: " + skier.getStartTime()+ ", Hastighet " + skier.getSpeed());  // Uppdatera UI:t med starttiden
-     // });
-    }
-
-    // Skapa och konfigurera checkpointen
-    private void setupCheckpoint() {
-        checkpoint.setStroke(Color.GREEN);  // Sätt checkpoint-linjen till grön
-        checkpoint.setStrokeWidth(3);       // Sätt linjens tjocklek
-    }
-
-    // Skapa och konfigurera knapparna
-    private void setupButtons() {
+    private void setupButtons(Label startnummerLabel, TextField startnummerInput, TextField ledartidInput) {
         startBtn.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         startBtn.setStyle("-fx-background-color:#4CC5E4");
+        startBtn.setOnAction(e -> {
+            // Exempel på att sätta starttid - detta kan implementeras senare när Skier-klassen finns
+            // long currentTime = System.currentTimeMillis();  
+            // skier.setStartTime(currentTime);
+            // startnummerLabel.setText("Starttid: " + skier.getStartTime() + ", Hastighet: " + skier.getHastighet());
+        });
 
         räknaUtButton.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         räknaUtButton.setStyle("-fx-background-color:#4CC5E4");
-
         räknaUtButton.setOnAction(event -> {
             try {
                 String startnummer = startnummerInput.getText();
@@ -112,30 +87,18 @@ public class RaceController extends Application {
         });
     }
 
-    // Skapa en metod för att skapa etiketter
-    private Label createLabel(String text) {
-        return new Label(text);
+    private VBox createLayout(Label startnummerLabel, TextField startnummerInput, Label aktuellTidLabel, TextField ledartidInput) {
+        VBox root = new VBox(10, startnummerLabel, startnummerInput, startBtn, aktuellTidLabel, ledartidInput,
+                createStartTypeComboBox(), räknaUtButton, resultatArea, skidbana, banlängdSlider, skidbanaLabel, mållinje);
+        root.setPadding(new Insets(10));
+
+        return root;
     }
 
-    // Uppdatera skidbanans och mållinjens position baserat på slidern
-    private void updateSkidbanaAndMållinje(double newLength) {
-        skidbana.setEndX(50 + newLength); // Uppdatera slutpunkten för skidbanan
-        skidbana.setStartX(50);           // Håll startpunkten konstant på X = 50
-        skidbana.setStroke(Color.BLUE);
-        skidbana.setStrokeWidth(5);
-
-        // Uppdatera mållinjens position
-        mållinje.setStartX(50 + newLength); // Mållinjen vid slutet av banan
-        mållinje.setEndX(50 + newLength);   // Mållinje vid samma position
-    }
-
-    // Uppdatera checkpointens position
-    private void updateCheckpoint(double newLength) {
-        double checkpointPosition = 5000; // Checkpoint på 5000 meter (5 km)
-        if (newLength >= checkpointPosition) {
-            checkpoint.setStartX(50 + checkpointPosition);  // Positionera checkpointen
-            checkpoint.setEndX(50 + checkpointPosition);    // Checkpointen är en vertikal linje
-        }
+    private ComboBox<String> createStartTypeComboBox() {
+        ComboBox<String> startTypeComboBox = new ComboBox<>();
+        startTypeComboBox.getItems().addAll("Individuell Start 15", "Individuell Start 30", "Masstart", "Jaktstart");
+        return startTypeComboBox;
     }
 
     public static void main(String[] args) {
