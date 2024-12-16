@@ -14,10 +14,13 @@ public class Race extends Task<Void> {
 	private List<Skier> skiers;
 	private TimeSimulator timeSimulator;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
+    private Result result;
+
 	
-	public Race(List<Skier> skiers, double speedFactor) throws InterruptedException {
+	public Race(List<Skier> skiers, double speedFactor, Result result) throws InterruptedException {
 		this.skiers = skiers;
 		this.timeSimulator = new TimeSimulator(speedFactor);
+		this.result = result; 
 
 	}
 
@@ -28,10 +31,11 @@ public class Race extends Task<Void> {
 
 	    Runnable updateRace = () -> {
 				for (Skier skier : skiers) {
-					skier.move(timeSimulator.generateTime());
-					skier.setRaceTime(timeSimulator.generateTime());
-					skier.checkSplitPoints(skier.getPosition());
-					skier.checkFinishLine(skier.getPosition());
+					long currentTime = timeSimulator.generateTime();
+					skier.move(currentTime);
+					skier.setRaceTime(currentTime);
+					skier.checkSplitPoints(result);
+					skier.checkFinishLine(result);
 					// Här läggs bakgrundsuppdateringar under körningen
 					// updaterar åkarnas position beroende på passerad tid sedan start
 				}

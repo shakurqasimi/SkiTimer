@@ -1,6 +1,7 @@
 package application;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +16,13 @@ public class Skier {
 	private List<Boolean> passedSplitPoints; // vilka stationer deltagern passerat
 	private boolean hasFinished; // om deltagaren åkt i mål
 	private SkiTrack track;
-	private Result result;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
-	private TimeSimulator timeSimulator;
 
 
 	public Skier() {
 	}
 
-	public Skier(int startnumber, int skierNumber, double speed, SkiTrack skiTrack) {
+	public Skier(int startnumber, int skierNumber, double speed, SkiTrack skiTrack, TimeSimulator timeSimulator) {
 		this.skierNumber = skierNumber;
 		this.startNumber = startnumber;
 		this.speed = speed;
@@ -88,11 +87,11 @@ public class Skier {
 
 	public void move(long currentTime) {
 		double deltaTime = currentTime - startTime;
-		if (currentTime >= startTime) {
+		if (currentTime >= startTime && !hasFinished) {
 		position = speed * deltaTime / 1000;
 		previousTime = currentTime;
 		}
-		//if satsen säkerställer att åkaren bara kan röra sig om de har startat
+		//if satsen säkerställer att åkaren bara kan röra sig om de har startat och inte gått i mål
 	}
 	
 	public void setRaceTime(long currentTime) {
@@ -105,23 +104,21 @@ public class Skier {
 		return raceTime;
 	}
 	
-	public void checkSplitPoints(double updatedPosition) {
+	public void checkSplitPoints(Result result) {
 		for(int i = 0; i < track.getSplitPoints().size(); i++) {
-			double splitPointPosition = updatedPosition;
 			if(!passedSplitPoints.get(i) && position >= track.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
-				System.out.println("ÅKARE " + skierNumber + " HAR PASSERAT VID " + df.format(splitPointPosition) + " METER" +
-				" OCH ÅKTTIDEN " + timeSimulator.formatTime(raceTime) );
-				
+				result.registerSplitTime(skierNumber, raceTime);
 			}
 		}
 	}
 	
-	public void checkFinishLine(double updatedPosition) {
+	
+	public void checkFinishLine(Result result) {
 		if(!hasFinished && position >= track.getTrackLength()) {
-			double splitPointPosition = updatedPosition;
+			result.registerFinishTime(skierNumber, raceTime);
 			hasFinished = true;
-			System.out.println("ÅKARE " + skierNumber + " HAR PASSERAT MÅLLINJEN VID " + df.format(splitPointPosition) + " METER");
+			System.out.println("ÅKARE " + skierNumber + " HAR PASSERAT MÅLLINJEN VID " + df.format(position) + " METER");
 
 		}
 	}
