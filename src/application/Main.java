@@ -22,6 +22,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public class Main extends Application implements EventHandler<ActionEvent> {
 
@@ -40,7 +42,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		track.setTrackLength(1000);
 		track.setSplitPoints(splitPointPositions);
 		
-		List<Skier> skiers = new ArrayList<Skier>();
+		List<Skier> skiers = new CopyOnWriteArrayList<Skier>();
 
 		Skier skier1 = new Skier(1, 12, speedSimulator.generateSpeed(0), track);
 		Skier skier2 = new Skier(2, 23, speedSimulator.generateSpeed(0), track);
