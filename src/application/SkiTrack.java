@@ -11,21 +11,21 @@ public class SkiTrack {
 
 	public SkiTrack() {
 	}
-	
+
 	public SkiTrack(double trackLength) {
 		this.trackLength = trackLength;
 		this.splitPoints = new ArrayList<Double>();
 	}
-	
-	public void setTrackLength (double trackLength) {
+
+	public void setTrackLength(double trackLength) {
 		this.trackLength = trackLength;
 
 	}
-	
+
 	public double getTrackLength() {
 		return trackLength;
 	}
-	
+
 	public void setSplitPoints(List<Double> splitPointPositions) {
 		for (Double position : splitPointPositions) {
 			if (position < 0 || position > trackLength) {
@@ -35,14 +35,9 @@ public class SkiTrack {
 		this.splitPoints = new ArrayList<>(splitPointPositions);
 		Collections.sort(this.splitPoints);
 	}
-	
+
 	public List<Double> getSplitPoints() {
 		return splitPoints;
 	}
-	
-	
-
-	
-
 
 }

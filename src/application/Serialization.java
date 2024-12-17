@@ -1,52 +1,33 @@
 package application;
 
-import java.beans.XMLEncoder;
 import java.beans.XMLDecoder;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.beans.XMLEncoder;
+import java.io.*;
+import java.util.List;
 
 public class Serialization {
 
-    // Serialisera en lista med Result-objekt till XML
-    public void serialize(Map<Integer, Long> map, String filename) {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(filename));
-            XMLEncoder xmlEncoder = new XMLEncoder(fileOutputStream);
-            xmlEncoder.writeObject(map);
-            xmlEncoder.close();
-            fileOutputStream.close();
-
-            System.out.println("Data har sparats till " + filename);
+    // Serialisera listan med åkare
+    public static void serialize(List<Skier> skiers, String filename) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(filename);
+             XMLEncoder xmlEncoder = new XMLEncoder(fileOutputStream)) {
+            xmlEncoder.writeObject(skiers); // Skriv hela listan med åkare
+            System.out.println("Skidåkare har sparats till fil: " + filename);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.err.println("Fel vid serialisering av åkare: " + ex.getMessage());
         }
     }
 
-    public Map<Integer, Long> deserialize(String filename) {
-        Map<Integer, Long> loadedResults = new HashMap<>();
-        try {
-            // Skapa en FileInputStream för att läsa från filen
-            FileInputStream fileInputStream = new FileInputStream(new File(filename));
-            XMLDecoder xmlDecoder = new XMLDecoder(fileInputStream);
-            // Dekoda XML och hämta den deserialiserade Map
-            loadedResults = (Map<Integer, Long>) xmlDecoder.readObject();
-            xmlDecoder.close();  // Stäng XMLDecoder
-            fileInputStream.close();  // Stäng FileInputStream
-
-            System.out.println("Data har laddats från " + filename);
+    // Deserialisera listan med åkare
+    public static List<Skier> deserialize(String filename) {
+        List<Skier> skiers = null;
+        try (FileInputStream fileInputStream = new FileInputStream(filename);
+             XMLDecoder xmlDecoder = new XMLDecoder(fileInputStream)) {
+            skiers = (List<Skier>) xmlDecoder.readObject();
+            System.out.println("Skidåkare har laddats från fil: " + filename);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.err.println("Fel vid deserialisering av åkare: " + ex.getMessage());
         }
-        return loadedResults;
+        return skiers;
     }
 }
-
-
-
-
-

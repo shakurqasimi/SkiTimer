@@ -43,6 +43,7 @@ public class Start {
         // Om starttiden anges av användaren
         generateStartTimes(skiers); // Uppdatera starttider när starttiden ändras
     }
+    
 
     // Metod för att generera starttider baserat på vald starttyp
     private void generateStartTimes(List<Skier> skiers) {
@@ -105,6 +106,8 @@ public class Start {
         }
         return formattedTimes;
     }
+    
+
 
 }
 

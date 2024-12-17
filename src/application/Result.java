@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Result {
 
@@ -20,8 +19,6 @@ public class Result {
 	// mellantid (100 m)
 	public void registerSplitTime(int skierNumber, long raceTime) {
 		if (!finishTimes.containsKey(skierNumber)) {
-
-			System.out.println("Test");
 			splitTimes.put(skierNumber, raceTime);
 			System.out.println("Åkare " + skierNumber + " registrerade mellantid vid 100 m: " + formatTime(raceTime));
 		}

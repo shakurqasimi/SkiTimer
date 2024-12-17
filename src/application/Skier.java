@@ -4,8 +4,12 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class Skier {
+
+public class Skier implements Serializable {
+	
+	private static final long serialVersionUID = 1;
 	private int startNumber;
 	private int skierNumber; // Unikt åkarnummer
 	private double position;
@@ -18,11 +22,10 @@ public class Skier {
 	private SkiTrack track;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 
-
 	public Skier() {
 	}
 
-	public Skier(int startnumber, int skierNumber, double speed, SkiTrack skiTrack, TimeSimulator timeSimulator) {
+	public Skier(int startnumber, int skierNumber, double speed, SkiTrack skiTrack) {
 		this.skierNumber = skierNumber;
 		this.startNumber = startnumber;
 		this.speed = speed;
@@ -42,7 +45,7 @@ public class Skier {
 	public void setStartnumber(int startnumber) {
 		startNumber = startnumber;
 	}
-	
+
 	public int getSkierNumber() {
 		return skierNumber;
 	}
@@ -83,42 +86,46 @@ public class Skier {
 		this.previousTime = previousTime;
 	}
 	
-	
+	public boolean hasFinished() {
+	    return hasFinished;
+	}
+
 
 	public void move(long currentTime) {
 		double deltaTime = currentTime - startTime;
 		if (currentTime >= startTime && !hasFinished) {
-		position = speed * deltaTime / 1000;
-		previousTime = currentTime;
+			position = speed * deltaTime / 1000;
+			previousTime = currentTime;
 		}
-		//if satsen säkerställer att åkaren bara kan röra sig om de har startat och inte gått i mål
+		// if satsen säkerställer att åkaren bara kan röra sig om de har startat och
+		// inte gått i mål
 	}
-	
+
 	public void setRaceTime(long currentTime) {
-		if (currentTime >= startTime) {
-		this.raceTime = currentTime - startTime;
+		if (currentTime >= startTime && !hasFinished) {
+			this.raceTime = currentTime - startTime;
 		}
 	}
-	
+
 	public long getRaceTime() {
 		return raceTime;
 	}
-	
+
 	public void checkSplitPoints(Result result) {
-		for(int i = 0; i < track.getSplitPoints().size(); i++) {
-			if(!passedSplitPoints.get(i) && position >= track.getSplitPoints().get(i)) {
+		for (int i = 0; i < track.getSplitPoints().size(); i++) {
+			if (!passedSplitPoints.get(i) && position >= track.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
 				result.registerSplitTime(skierNumber, raceTime);
 			}
 		}
 	}
-	
-	
+
 	public void checkFinishLine(Result result) {
-		if(!hasFinished && position >= track.getTrackLength()) {
+		if (!hasFinished && position >= track.getTrackLength()) {
 			result.registerFinishTime(skierNumber, raceTime);
 			hasFinished = true;
-			System.out.println("ÅKARE " + skierNumber + " HAR PASSERAT MÅLLINJEN VID " + df.format(position) + " METER");
+			System.out
+					.println("ÅKARE " + skierNumber + " HAR PASSERAT MÅLLINJEN VID " + df.format(position) + " METER");
 
 		}
 	}
