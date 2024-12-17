@@ -9,6 +9,7 @@ public class Serialization {
 
     // Serialisera listan med åkare
     public static void serialize(List<Skier> skiers, String filename) {
+    	
         try (FileOutputStream fileOutputStream = new FileOutputStream(filename);
              XMLEncoder xmlEncoder = new XMLEncoder(fileOutputStream)) {
             xmlEncoder.writeObject(skiers); // Skriv hela listan med åkare

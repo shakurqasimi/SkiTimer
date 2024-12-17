@@ -36,22 +36,22 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		List<Double> splitPointPositions = new ArrayList<Double>(); 
 		splitPointPositions.add(100.0); //Sätt checkpoints inom banan
-		SkiTrack skiTrack = new SkiTrack();
-		skiTrack.setTrackLength(1000);
-		skiTrack.setSplitPoints(splitPointPositions);
+		SkiTrack track = new SkiTrack();
+		track.setTrackLength(1000);
+		track.setSplitPoints(splitPointPositions);
 		
 		List<Skier> skiers = new ArrayList<Skier>();
 
-		Skier skier1 = new Skier(1, 12, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier2 = new Skier(2, 23, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier3 = new Skier(3, 83, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier4 = new Skier(4, 77, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier5 = new Skier(5, 91, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier6 = new Skier(6, 14, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier7 = new Skier(7, 22, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier8 = new Skier(8, 54, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier9 = new Skier(9, 38, speedSimulator.generateSpeed(0), skiTrack);
-		Skier skier10 = new Skier(10, 46, speedSimulator.generateSpeed(0), skiTrack);
+		Skier skier1 = new Skier(1, 12, speedSimulator.generateSpeed(0), track);
+		Skier skier2 = new Skier(2, 23, speedSimulator.generateSpeed(0), track);
+		Skier skier3 = new Skier(3, 83, speedSimulator.generateSpeed(0), track);
+		Skier skier4 = new Skier(4, 77, speedSimulator.generateSpeed(0), track);
+		Skier skier5 = new Skier(5, 91, speedSimulator.generateSpeed(0), track);
+		Skier skier6 = new Skier(6, 14, speedSimulator.generateSpeed(0), track);
+		Skier skier7 = new Skier(7, 22, speedSimulator.generateSpeed(0), track);
+		Skier skier8 = new Skier(8, 54, speedSimulator.generateSpeed(0), track);
+		Skier skier9 = new Skier(9, 38, speedSimulator.generateSpeed(0), track);
+		Skier skier10 = new Skier(10, 46, speedSimulator.generateSpeed(0), track);
 
 		// Åkarobject: Startnummer, åkarnummer, hastighet
 
@@ -98,8 +98,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 				Start.StartType selectedType = startTypeComboBox.getValue();
 				start = new Start(selectedType, skiers);
-				Result result = new Result();
-				Race race = new Race(skiers, 20, result);
+				Result result = new Result(track);
+				Race race = new Race(skiers, 10, result);
 				Thread raceThread = new Thread(race);
 				raceThread.setDaemon(true);
 				raceThread.start();

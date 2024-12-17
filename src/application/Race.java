@@ -19,10 +19,9 @@ public class Race extends Task<Void> {
 	private ScheduledFuture<?> updateRaceFuture;
 	private boolean raceFinished = false;
 	private boolean raceFinishedFinal = false;
-	private Start start;
+
 	private long raceStartTime;
 	private long raceFinishTime;
-
 
 	public Race(List<Skier> skiers, double speedFactor, Result result) throws InterruptedException {
 		this.skiers = skiers;
@@ -33,29 +32,32 @@ public class Race extends Task<Void> {
 
 	@Override
 	protected Void call() throws Exception {
-
 		raceStartTime = timeSimulator.generateTime();
-		
+
 		scheduler = Executors.newScheduledThreadPool(2);
 
 		Runnable updateRace = () -> {
+			synchronized (skiers) {
 
-			for (Skier skier : skiers) {
+				for (Skier skier : skiers) {
 
-				long currentTime = timeSimulator.generateTime();
-				skier.move(currentTime);
-				skier.setRaceTime(currentTime);
-				skier.checkSplitPoints(result);
-				skier.checkFinishLine(result);
-				// Här läggs bakgrundsuppdateringar under körningen
-				// updaterar åkarnas position beroende på passerad tid sedan start
-			}
-			if (skiers.stream().allMatch(Skier::hasFinished)) {
-				Serialization.serialize(skiers, "result.txt");
-				System.out.println("Resultat sparade");
-				raceFinishTime = timeSimulator.generateTime();
-				raceFinished = true;
-				updateRaceFuture.cancel(false);
+					long currentTime = timeSimulator.generateTime();
+					skier.move(currentTime);
+					skier.setRaceTime(currentTime);
+					result.checkSplitPoints(skier);
+					result.checkFinishLine(skier);
+					// Här läggs bakgrundsuppdateringar under körningen (setters)
+					// updaterar åkarnas position beroende på passerad tid sedan start
+
+				}
+				if (skiers.stream().allMatch(Skier::hasFinished)) {
+					raceFinishTime = timeSimulator.generateTime();
+					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
+
+					Serialization.serialize(skiers, "result.txt");
+					raceFinished = true;
+					updateRaceFuture.cancel(false);
+				}
 			}
 
 		};
@@ -63,29 +65,26 @@ public class Race extends Task<Void> {
 		Runnable printRace = () -> {
 
 			Platform.runLater(() -> {
-				// Här läggs UI uppdateringar under körningen
-				if (!raceFinishedFinal) {
-					if (raceFinished) {
-						System.out.println("SLUTRESULTAT:");
-						raceFinishedFinal = true;
-					}
+				// Här läggs UI uppdateringar under körningen (getters)
+				if (!raceFinished) {
+
 					for (Skier skier : skiers) {
-
-
 						System.out.print("Åkare: " + skier.getSkierNumber() + " har åkt "
 								+ df.format(skier.getPosition()) + " meter");
 						System.out.println(" och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()));
 
 					}
-					if (raceFinishedFinal) {
-						System.out.println("LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime));
-
-					}
+				}
+				if (raceFinished && !raceFinishedFinal) {
+					result.displayFinalResults();
+					System.out.println(
+							"LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime));
+					raceFinishedFinal = true;
 				}
 
 			});
 		};
-		scheduler.scheduleAtFixedRate(updateRace, 0, 10, TimeUnit.MILLISECONDS);
+		scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
 		scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);
 
 		return null;

@@ -20,7 +20,6 @@ public class Skier implements Serializable {
 	private List<Boolean> passedSplitPoints; // vilka stationer deltagern passerat
 	private boolean hasFinished; // om deltagaren åkt i mål
 	private SkiTrack track;
-	private static final DecimalFormat df = new DecimalFormat("0.00");
 
 	public Skier() {
 	}
@@ -44,6 +43,16 @@ public class Skier implements Serializable {
 
 	public void setStartnumber(int startnumber) {
 		startNumber = startnumber;
+	}
+	
+	
+
+	public List<Boolean> getPassedSplitPoints() {
+		return passedSplitPoints;
+	}
+
+	public void setPassedSplitPoints(List<Boolean> passedSplitPoints) {
+		this.passedSplitPoints = passedSplitPoints;
 	}
 
 	public int getSkierNumber() {
@@ -90,6 +99,9 @@ public class Skier implements Serializable {
 	    return hasFinished;
 	}
 
+	public void setHasFinished(boolean hasFinished) {
+		this.hasFinished = hasFinished;
+	}
 
 	public void move(long currentTime) {
 		double deltaTime = currentTime - startTime;
@@ -111,23 +123,6 @@ public class Skier implements Serializable {
 		return raceTime;
 	}
 
-	public void checkSplitPoints(Result result) {
-		for (int i = 0; i < track.getSplitPoints().size(); i++) {
-			if (!passedSplitPoints.get(i) && position >= track.getSplitPoints().get(i)) {
-				passedSplitPoints.set(i, true);
-				result.registerSplitTime(skierNumber, raceTime);
-			}
-		}
-	}
 
-	public void checkFinishLine(Result result) {
-		if (!hasFinished && position >= track.getTrackLength()) {
-			result.registerFinishTime(skierNumber, raceTime);
-			hasFinished = true;
-			System.out
-					.println("ÅKARE " + skierNumber + " HAR PASSERAT MÅLLINJEN VID " + df.format(position) + " METER");
-
-		}
-	}
 
 }

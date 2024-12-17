@@ -1,5 +1,6 @@
 package application;
 
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,17 +11,22 @@ public class Result {
 
 	private Map<Integer, Long> splitTimes;
 	private Map<Integer, Long> finishTimes;
+	private SkiTrack track;
+	private static final DecimalFormat df = new DecimalFormat("0.00");
 
-	public Result() {
+
+	public Result(SkiTrack track) {
 		this.splitTimes = new HashMap<>();
 		this.finishTimes = new HashMap<>();
+		this.track = track;
+
 	}
 
 	// mellantid (100 m)
-	public void registerSplitTime(int skierNumber, long raceTime) {
+	public void registerSplitTime(int skierNumber, long raceTime, double splitPoint) {
 		if (!finishTimes.containsKey(skierNumber)) {
 			splitTimes.put(skierNumber, raceTime);
-			System.out.println("Åkare " + skierNumber + " registrerade mellantid vid 100 m: " + formatTime(raceTime));
+			System.out.println("Åkare " + skierNumber + " registrerade mellantid vid "+ splitPoint + " m: " + formatTime(raceTime));
 		}
 	}
 
@@ -52,6 +58,26 @@ public class Result {
 		System.out.println("Slutresultat (sorterat efter sluttid):");
 		finishTimes.entrySet().stream().sorted(Map.Entry.comparingByValue())
 				.forEach(entry -> System.out.println("Åkare " + entry.getKey() + ": " + formatTime(entry.getValue())));
+	}
+	
+	public void checkSplitPoints(Skier skier) {
+		List<Boolean> passedSplitPoints = skier.getPassedSplitPoints();
+		for (int i = 0; i < track.getSplitPoints().size(); i++) {
+			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
+				passedSplitPoints.set(i, true);
+				registerSplitTime(skier.getSkierNumber(), skier.getRaceTime(), track.getSplitPoint(i));
+			}
+		}
+	}
+	
+	public void checkFinishLine(Skier skier) {
+		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
+			registerFinishTime(skier.getSkierNumber(), skier.getRaceTime());
+			skier.setHasFinished(true);
+			System.out
+					.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID " + df.format(skier.getPosition()) + " METER");
+
+		}
 	}
 
 	public String formatTime(long time) {

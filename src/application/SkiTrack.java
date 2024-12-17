@@ -29,7 +29,7 @@ public class SkiTrack {
 	public void setSplitPoints(List<Double> splitPointPositions) {
 		for (Double position : splitPointPositions) {
 			if (position < 0 || position > trackLength) {
-				throw new IllegalArgumentException("Ledarplatsen ligger utanför spåret");
+				throw new IllegalArgumentException("Stationen ligger utanför spåret");
 			}
 		}
 		this.splitPoints = new ArrayList<>(splitPointPositions);
@@ -39,5 +39,8 @@ public class SkiTrack {
 	public List<Double> getSplitPoints() {
 		return splitPoints;
 	}
-
+	
+	public Double getSplitPoint(int index) {
+		return splitPoints.get(index);
+	}
 }
