@@ -55,7 +55,6 @@ public class Result {
 
 	// slutresultat
 	public void displayFinalResults() {
-		System.out.println("Slutresultat (sorterat efter sluttid):");
 		finishTimes.entrySet().stream().sorted(Map.Entry.comparingByValue())
 				.forEach(entry -> System.out.println("Åkare " + entry.getKey() + ": " + formatTime(entry.getValue())));
 	}
@@ -90,6 +89,12 @@ public class Result {
 		long millis = duration.toMillisPart();
 		return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, millis);
 		// Formaterad tid för läsbarhet
+	}
+
+	private void appendToLog(String message) {
+		Platform.runLater(() -> {
+			logArea.appendText(message + "\n");
+		});
 	}
 
 }
