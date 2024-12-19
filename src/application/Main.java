@@ -11,7 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ArrayList;
 
 public class Main extends Application implements EventHandler<ActionEvent> {
 
