@@ -33,19 +33,24 @@ public class Race extends Task<Void> {
 	public Race() {
 
 	}
+	
+	public boolean hasFinished() {
+		return raceFinished;
+	}
 
 	public void InitializeRace(List<Skier> skiers, double speedFactor, Result result) {
 		this.skiers = skiers;
 		this.timeSimulator = new TimeSimulator(speedFactor);
 		this.result = result;
 	}
+	
 
 	public void resetRace() {
 		for (Skier skier : skiers) {
 			skier.resetSkier();
 		}
 		result.clearResults();
-		
+	    scheduler.shutdownNow();		
 	}
 
 	@Override

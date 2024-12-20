@@ -30,18 +30,19 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 	private List<Skier> previousSkiers;
+	private Race race; 
 
 	private Start start;
 
 	@Override
 	public void start(Stage primaryStage) throws InterruptedException {
 
-		List<Double> splitPointPositions = new ArrayList<Double>(); 
-		splitPointPositions.add(100.0); //Sätt checkpoints inom banan
+		List<Double> splitPointPositions = new ArrayList<Double>();
+		splitPointPositions.add(100.0); // Sätt checkpoints inom banan
 		SkiTrack track = new SkiTrack();
 		track.setTrackLength(1000);
 		track.setSplitPoints(splitPointPositions);
-		
+
 		List<Skier> skiers = new ArrayList<Skier>();
 
 		Skier skier1 = new Skier(1, 12, speedSimulator.generateSpeed(0), track);
@@ -58,7 +59,6 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		// Åkarobject: Startnummer, åkarnummer, hastighet
 		start = new Start();
 
-
 		skiers.add(skier1);
 		skiers.add(skier2);
 		skiers.add(skier3);
@@ -69,30 +69,26 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		skiers.add(skier8);
 		skiers.add(skier9);
 		skiers.add(skier10);
-		
+
+
 		Result result = new Result(track);
-		Race race = new Race();
-        Button showSplitsButton = new Button ("Visa Mellantider");
+		Button showSplitsButton = new Button("Visa Mellantider");
 		List<Integer> timeGaps = new ArrayList<>();
 		List<Long> previousTimes = new ArrayList<>();
 
-
-
 		VBox root = new VBox(10);
 		root.setPadding(new Insets(15));
-		
-		
-        TextField startNumberInput = new TextField();
-        startNumberInput.setPromptText("Ange Åkarnummer");
 
+		TextField startNumberInput = new TextField();
+		startNumberInput.setPromptText("Ange Åkarnummer");
 
 		ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();
 		startTypeComboBox.getItems().addAll(Start.StartType.values());
 		startTypeComboBox.setValue(Start.StartType.INDIVIDUAL_15);
 
-		Button generateButton = new Button("Generera Starttider");
+		Button generateButton = new Button("Starta/Stoppa lopp");
 
-		TextArea resultArea = new TextArea(); 
+		TextArea resultArea = new TextArea();
 		resultArea.setEditable(false);
 
 		VBox pursuitBox = new VBox(5);
@@ -109,60 +105,59 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 				Start.StartType selectedType = startTypeComboBox.getValue();
 
 				double raceSpeedFactor = 10;
+				
+				if (race != null) {
+		            race.resetRace(); 
+		            }
 
 				if (selectedType != Start.StartType.PURSUIT_START) {
-				start = new Start(selectedType, skiers);
-				List<String> startTimes = start.getFormattedStartTimes(skiers);
-				resultArea.setText(String.join("\n", startTimes));
-				race.InitializeRace(skiers, raceSpeedFactor, result);
-
+					start = new Start(selectedType, skiers);
+					List<String> startTimes = start.getFormattedStartTimes(skiers);
+					resultArea.setText(String.join("\n", startTimes));
+					race = new Race();
+					race.InitializeRace(skiers, raceSpeedFactor, result);
+					Thread raceThread = new Thread(race);
+					raceThread.setDaemon(true);
+					new Thread(race).start();
 				}
-
 
 				if (selectedType == Start.StartType.PURSUIT_START) {
 					start = new Start(selectedType, previousSkiers);
 					List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
 					resultArea.setText(String.join("\n", startTimes));
+					race = new Race();
 					race.InitializeRace(previousSkiers, raceSpeedFactor, result);
+					Thread raceThread = new Thread(race);
+					raceThread.setDaemon(true);
+					new Thread(race).start();
 				}
-				
-
-				
-				Thread raceThread = new Thread(race);
-				raceThread.setDaemon(true);
-				raceThread.start();
-
 
 			} catch (Exception e) {
 				resultArea.setText("Fel: " + e.getMessage());
 			}
 		});
 
-        showSplitsButton.setOnAction(event -> {
-           
-                int startNumber = Integer.parseInt(startNumberInput.getText().trim());
-                Map<Integer, Long> splitTimes = result.getSplitTimesStartNum(startNumber);
-               
-            if (splitTimes.isEmpty()) {
-                resultArea.setText("Inga mellantider hittades för åkare " + startNumber);
-            } else {
-                resultArea.setText("Mellantider för åkare " + startNumber + ":\n");
-                
-                for (Integer split : splitTimes.keySet()) {
-                    resultArea.appendText(split + "\n");
-                }
-            }
-        });
-        
-        
+		showSplitsButton.setOnAction(event -> {
 
+			int startNumber = Integer.parseInt(startNumberInput.getText().trim());
+			Map<Integer, Long> splitTimes = result.getSplitTimesStartNum(startNumber);
+
+			if (splitTimes.isEmpty()) {
+				resultArea.setText("Inga mellantider hittades för åkare " + startNumber);
+			} else {
+				resultArea.setText("Mellantider för åkare " + startNumber + ":\n");
+
+				for (Integer split : splitTimes.keySet()) {
+					resultArea.appendText(split + "\n");
+				}
+			}
+		});
 
 		root.getChildren().addAll(new Label("Välj Starttyp:"), startTypeComboBox,
 				new Label("Sök placering med startnummer:"), startNumberInput, pursuitBox, generateButton,
 				new Label("Genererade Starttider:"), resultArea);
-		
-        
-    	Button loadPreviousResultsButton = new Button("Ladda Tidigare Resultat");
+
+		Button loadPreviousResultsButton = new Button("Ladda Tidigare Resultat");
 
 		loadPreviousResultsButton.setOnAction(event -> {
 			try {
@@ -172,9 +167,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 					StringBuilder results = new StringBuilder("Tidigare resultat:\n");
 					for (Skier skier : previousSkiers) {
-						results.append("Åkare ").append(skier.getSkierNumber())
-						.append(": Tid ").append(df.format(skier.getRaceTime() / 1000.0)) 
-						.append(" sekunder\n");
+						results.append("Åkare ").append(skier.getSkierNumber()).append(": Tid ")
+								.append(df.format(skier.getRaceTime() / 1000.0)).append(" sekunder\n");
 						previousTimes.add(skier.getRaceTime());
 					}
 					start.calculatePursuitTimeGaps(previousSkiers);
@@ -190,21 +184,20 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 				resultArea.setText("Fel vid laddning av tidigare resultat: " + e.getMessage());
 			}
 		});
-		
-		
-		root.getChildren().add(loadPreviousResultsButton); 
+
+		root.getChildren().add(loadPreviousResultsButton);
 
 		Scene scene = new Scene(root, 400, 400);
 		primaryStage.setTitle("Starttidshantering");
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
-        primaryStage.setOnCloseRequest(event -> { 
-        	System.out.println("Stänger av");
-        	Platform.exit();
-        	System.exit(0);
-        	//Stänger alla trådar när fönstret stängs
-        });
+
+		primaryStage.setOnCloseRequest(event -> {
+			System.out.println("Stänger av");
+			Platform.exit();
+			System.exit(0);
+			// Stänger alla trådar när fönstret stängs
+		});
 
 	}
 
