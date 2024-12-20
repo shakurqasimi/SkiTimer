@@ -12,7 +12,6 @@ import javafx.concurrent.Task;
 public class Race extends Task<Void> {
 
 	private ScheduledExecutorService scheduler;
-	private List<Skier> skiers;
 	private TimeSimulator timeSimulator;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 	private Result result;
@@ -22,6 +21,7 @@ public class Race extends Task<Void> {
 
 	private long raceStartTime;
 	private long raceFinishTime;
+	private List<Skier> skiers;
 
 	public Race(List<Skier> skiers, double speedFactor, Result result) throws InterruptedException {
 		this.skiers = skiers;
@@ -29,7 +29,16 @@ public class Race extends Task<Void> {
 		this.result = result;
 
 	}
-
+	
+	public Race() {
+		
+	}
+	
+	public void InitializeRace(List<Skier> skiers, double speedFactor, Result result) {
+		this.skiers = skiers;
+		this.timeSimulator = new TimeSimulator(speedFactor);
+		this.result = result;	
+	}
 	@Override
 	protected Void call() throws Exception {
 		raceStartTime = timeSimulator.generateTime();
@@ -51,6 +60,7 @@ public class Race extends Task<Void> {
 
 				}
 				if (skiers.stream().allMatch(Skier::hasFinished)) {
+					//när alla är klara sorteras resultatet för serialisering
 					raceFinishTime = timeSimulator.generateTime();
 					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
 
@@ -65,7 +75,7 @@ public class Race extends Task<Void> {
 		Runnable printRace = () -> {
 
 			Platform.runLater(() -> {
-				// Här läggs UI uppdateringar under körningen (getters)
+				// Här skickas UI uppdateringar under körningen (getters)
 				if (!raceFinished) {
 
 					for (Skier skier : skiers) {

@@ -21,13 +21,15 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Main extends Application implements EventHandler<ActionEvent> {
 
 	static SpeedSimulator speedSimulator = new SpeedSimulator();
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
+	private List<Skier> previousSkiers;
 
 	private Start start;
 
@@ -54,6 +56,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		Skier skier10 = new Skier(10, 46, speedSimulator.generateSpeed(0), track);
 
 		// Åkarobject: Startnummer, åkarnummer, hastighet
+		start = new Start();
+
 
 		skiers.add(skier1);
 		skiers.add(skier2);
@@ -65,16 +69,25 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		skiers.add(skier8);
 		skiers.add(skier9);
 		skiers.add(skier10);
+		
+		Result result = new Result(track);
+		Race race = new Race();
+        Button showSplitsButton = new Button ("Visa Mellantider");
+		List<Integer> timeGaps = new ArrayList<>();
+		List<Long> previousTimes = new ArrayList<>();
+
+
 
 		VBox root = new VBox(10);
 		root.setPadding(new Insets(15));
+		
+        TextField startNumberInput = new TextField();
+        startNumberInput.setPromptText("Ange Åkarnummer");
+
 
 		ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();
 		startTypeComboBox.getItems().addAll(Start.StartType.values());
 		startTypeComboBox.setValue(Start.StartType.INDIVIDUAL_15);
-
-		TextField startTimeField = new TextField();
-		startTimeField.setPromptText("Ange starttid (t.ex. 10:00:00)");
 
 		Button generateButton = new Button("Generera Starttider");
 
@@ -83,9 +96,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		VBox pursuitBox = new VBox(5);
 		pursuitBox.setPadding(new Insets(5));
-		TextField timeGapsField = new TextField();
-		timeGapsField.setPromptText("Tidsavstånd för jaktstart (t.ex. 10,20,30)");
-		pursuitBox.getChildren().addAll(new Label("Tidsavstånd för Jaktstart:"), timeGapsField);
+
 		pursuitBox.setVisible(false);
 
 		startTypeComboBox.setOnAction(event -> {
@@ -94,42 +105,91 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		generateButton.setOnAction(event -> {
 			try {
+				Start.StartType selectedType = startTypeComboBox.getValue();
+
+				if (selectedType != Start.StartType.PURSUIT_START) {
+				start = new Start(selectedType, skiers);
+				List<String> startTimes = start.getFormattedStartTimes(skiers);
+				resultArea.setText(String.join("\n", startTimes));
+				race.InitializeRace(skiers, 1, result);
+
+				}
+
+
+				if (selectedType == Start.StartType.PURSUIT_START) {
+					start = new Start(selectedType, previousSkiers);
+					List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
+					resultArea.setText(String.join("\n", startTimes));
+					race.InitializeRace(previousSkiers, 1, result);
+				}
 				
 
-				Start.StartType selectedType = startTypeComboBox.getValue();
-				start = new Start(selectedType, skiers);
-				Result result = new Result(track);
-				Race race = new Race(skiers, 10, result);
+				
 				Thread raceThread = new Thread(race);
 				raceThread.setDaemon(true);
 				raceThread.start();
 
-				String startTime = startTimeField.getText();
-
-				if (!startTime.isEmpty()) {
-					start.setFirstStartTime(startTime, skiers);
-				}
-
-				if (selectedType == Start.StartType.PURSUIT_START) {
-					String[] gaps = timeGapsField.getText().split(",");
-					List<Integer> timeGaps = new ArrayList<>();
-					for (String gap : gaps) {
-						timeGaps.add(Integer.parseInt(gap.trim()));
-					}
-					start.setTimeGaps(timeGaps, skiers);
-				}
-
-				List<String> startTimes = start.getFormattedStartTimes();
-				resultArea.setText(String.join("\n", startTimes));
 
 			} catch (Exception e) {
 				resultArea.setText("Fel: " + e.getMessage());
 			}
 		});
 
+        showSplitsButton.setOnAction(event -> {
+           
+                int startNumber = Integer.parseInt(startNumberInput.getText().trim());
+                Map<Integer, Long> splitTimes = result.getSplitTimesStartNum(startNumber);
+               
+            if (splitTimes.isEmpty()) {
+                resultArea.setText("Inga mellantider hittades för åkare " + startNumber);
+            } else {
+                resultArea.setText("Mellantider för åkare " + startNumber + ":\n");
+                
+                for (Integer split : splitTimes.keySet()) {
+                    resultArea.appendText(split + "\n");
+                }
+            }
+        });
+        
+        
+
+
 		root.getChildren().addAll(new Label("Välj Starttyp:"), startTypeComboBox,
-				new Label("Ange Första Starttid (hh:mm:ss):"), startTimeField, pursuitBox, generateButton,
+				new Label("Sök placering med startnummer:"), startNumberInput, pursuitBox, generateButton,
 				new Label("Genererade Starttider:"), resultArea);
+		
+        
+    	Button loadPreviousResultsButton = new Button("Ladda Tidigare Resultat");
+
+		loadPreviousResultsButton.setOnAction(event -> {
+			try {
+				previousSkiers = Serialization.deserialize("result.txt");
+
+				if (previousSkiers != null && !previousSkiers.isEmpty()) {
+
+					StringBuilder results = new StringBuilder("Tidigare resultat:\n");
+					for (Skier skier : previousSkiers) {
+						results.append("Åkare ").append(skier.getSkierNumber())
+						.append(": Tid ").append(df.format(skier.getRaceTime() / 1000.0)) 
+						.append(" sekunder\n");
+						previousTimes.add(skier.getRaceTime());
+					}
+					start.calculatePursuitTimeGaps(previousSkiers);
+					// Räkna ut starttidsskillnader utifrån resultat
+					resultArea.setText(results.toString());
+					// Uppdatera TextArea med resultaten
+
+				} else {
+					resultArea.setText("Inga tidigare resultat att visa.");
+				}
+			} catch (Exception e) {
+				// Visa felmeddelande om något går fel
+				resultArea.setText("Fel vid laddning av tidigare resultat: " + e.getMessage());
+			}
+		});
+		
+		
+		root.getChildren().add(loadPreviousResultsButton); 
 
 		Scene scene = new Scene(root, 400, 400);
 		primaryStage.setTitle("Starttidshantering");

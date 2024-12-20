@@ -12,7 +12,7 @@ public class SkiTrack {
 	public SkiTrack() {
 	}
 
-	public SkiTrack(double trackLength) {
+	public SkiTrack(double trackLength, List<Double> splitPointPositions) {
 		this.trackLength = trackLength;
 		this.splitPoints = new ArrayList<Double>();
 	}

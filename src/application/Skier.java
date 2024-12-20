@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-
 public class Skier implements Serializable {
-	
+
 	private static final long serialVersionUID = 1;
 	private int startNumber;
 	private int skierNumber; // Unikt åkarnummer
@@ -44,8 +43,6 @@ public class Skier implements Serializable {
 	public void setStartnumber(int startnumber) {
 		startNumber = startnumber;
 	}
-	
-	
 
 	public List<Boolean> getPassedSplitPoints() {
 		return passedSplitPoints;
@@ -94,13 +91,25 @@ public class Skier implements Serializable {
 	public void setPreviousTime(long previousTime) {
 		this.previousTime = previousTime;
 	}
-	
+
 	public boolean hasFinished() {
-	    return hasFinished;
+		return hasFinished;
 	}
 
 	public void setHasFinished(boolean hasFinished) {
 		this.hasFinished = hasFinished;
+	}
+
+	public void setRaceTime(long currentTime) {
+		if (currentTime >= startTime && !hasFinished) {
+			this.raceTime = currentTime - startTime;
+		} else {
+			this.raceTime = 0;
+		}
+	}
+
+	public long getRaceTime() {
+		return raceTime;
 	}
 
 	public void move(long currentTime) {
@@ -112,17 +121,5 @@ public class Skier implements Serializable {
 		// if satsen säkerställer att åkaren bara kan röra sig om de har startat och
 		// inte gått i mål
 	}
-
-	public void setRaceTime(long currentTime) {
-		if (currentTime >= startTime && !hasFinished) {
-			this.raceTime = currentTime - startTime;
-		}
-	}
-
-	public long getRaceTime() {
-		return raceTime;
-	}
-
-
 
 }

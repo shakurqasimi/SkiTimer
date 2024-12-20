@@ -1,119 +1,107 @@
-
 package application;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Start {
 
-    // Enum som representerar de olika starttyperna
     public enum StartType {
-        INDIVIDUAL_15,   
-        INDIVIDUAL_30,   
-        MASS_START,      
-        PURSUIT_START    
+        INDIVIDUAL_15, 
+        INDIVIDUAL_30, 
+        MASS_START, 
+        PURSUIT_START
     }
 
-    private StartType startType;  
-    private TimeSimulator timeSimulator;  // Instans av TimeSimulator för att hantera tid
-    private List<Long> startTimes; // Lista för att lagra alla starttider i millisekunder
-    private long firstStartTime;  // Första starttiden, hämtas från TimeSimulator
-    private List<Integer> timeGaps; // Lista för tidsavstånd för jaktstart
+    private StartType startType;
+    private TimeSimulator timeSimulator;
+    private List<Long> startTimes;
+    private long firstStartTime;
+    private List<Skier> skiers;
+    private List<Integer> timeGaps;
 
-    // Konstruktor 
     public Start(StartType startType, List<Skier> skiers) {
         this.startType = startType;
         this.startTimes = new ArrayList<>();
+        this.skiers = skiers;
         this.timeGaps = new ArrayList<>();
-        this.timeSimulator = new TimeSimulator();  // Skapar en TimeSimulator med en speed factor
-        this.firstStartTime = timeSimulator.generateTime();  // Hämtar den aktuella tiden i millisekunder direkt från TimeSimulator
-        generateStartTimes(skiers); // Generera starttider baserat på starttypen
-    }
-
-    // Metod för att sätta starttyp
-    public void setStartType(StartType startType, List<Skier> skiers) {
-        this.startType = startType;
-        generateStartTimes(skiers);  // Uppdatera starttider när starttyp ändras
-    }
-
-
-
-    // Metod för att sätta starttid i hh:mm:ss format
-    public void setFirstStartTime(String startTimeString, List<Skier> skiers) {
-        // Om starttiden anges av användaren
-        generateStartTimes(skiers); // Uppdatera starttider när starttiden ändras
+        this.timeSimulator = new TimeSimulator();
+        this.firstStartTime = timeSimulator.generateTime();
+        generateStartTimes();
     }
     
-
-    // Metod för att generera starttider baserat på vald starttyp
-    private void generateStartTimes(List<Skier> skiers) {
+    public Start() {
     	
-    	int i = 0;
-        startTimes.clear(); 
+    }
 
+
+    public void generateStartTimes() {
+        int i = 0;
+        
         switch (startType) {
             case INDIVIDUAL_15:
                 for (Skier skier : skiers) {
-                	long startTime = 15 * i * 1000;
-                	skier.setStartTime(startTime);
-                	skier.setPreviousTime(startTime);
-                    startTimes.add(startTime); 
+                    long startTime = 15 * i * 1000;
+                    skier.setStartTime(startTime);
+                    skier.setPreviousTime(startTime);
+                    startTimes.add(startTime);
                     i++;
                 }
                 break;
             case INDIVIDUAL_30:
-            	for (Skier skier : skiers) {
-            		long startTime = 30 * i *  1000; 
-                	skier.setStartTime(startTime);
-                	skier.setPreviousTime(startTime);
-                    startTimes.add(startTime); 
+                for (Skier skier : skiers) {
+                    long startTime = 30 * i * 1000;
+                    skier.setStartTime(startTime);
+                    skier.setPreviousTime(startTime);
+                    startTimes.add(startTime);
                     i++;
                 }
                 break;
             case MASS_START:
-            for (Skier skier : skiers) {
-                	skier.setStartTime(0);
-                	skier.setPreviousTime(0);
-            }
-                startTimes.add(firstStartTime); 
+                for (Skier skier : skiers) {
+                    skier.setStartTime(0);
+                    skier.setPreviousTime(0);
+                }
+                startTimes.add(firstStartTime);
                 break;
             case PURSUIT_START:
-                if (timeGaps.isEmpty()) {
-                    throw new IllegalStateException("Det finns inget tidsavstånd för jaktstart än"); // Om inga tidsavstånd är satta för jaktstart
+                for (Skier skier : skiers) {
+                    skier.setRaceTime(0);
+                    skier.setPreviousTime(0);
+                    skier.setPosition(0);
                 }
-                for (int gap : timeGaps) {
-                    startTimes.add(firstStartTime);  // Lägg till starttiden för varje åkare
-                    firstStartTime += gap * 1000;  // Lägg till tidsavstånd för nästa åkare (gap i sekunder)
-                }
-                break;
+
+
+            	break;
         }
     }
-
-    // Metod för att sätta tidsavstånd för jaktstart (endast för PURSUIT_START)
-    public void setTimeGaps(List<Integer> timeGaps, List<Skier> skiers) {
-        if (startType != StartType.PURSUIT_START) {
-            throw new IllegalArgumentException("Tidsavstånd kan endast anges för jaktstart"); // Kasta ett undantag om starttypen inte är jaktstart
-        }
-        this.timeGaps = timeGaps;
-        generateStartTimes(skiers); // Uppdatera starttider när tidsavstånd sätts
+    
+    
+    public void calculatePursuitTimeGaps (List<Skier> previousSkiers) {
+    	long timeGap = previousSkiers.get(0).getStartTime();
+    	previousSkiers.get(0).setStartTime(0);
+    	previousSkiers.get(0).setPreviousTime(0);
+    	for (int i = 1; i < previousSkiers.size(); i++) {
+            Skier previousSkier = previousSkiers.get(i);
+            timeGap += previousSkier.getRaceTime() - previousSkiers.get(i - 1).getRaceTime();
+            previousSkier.setStartTime(timeGap);
+            previousSkier.setPreviousTime(timeGap);
+            System.out.println(previousSkier.getStartTime());
+    	}
+    	
     }
 
-    // Getter för att hämta starttider som en lista av hh:mm:ss-format
-    public List<String> getFormattedStartTimes() {
+
+
+    public List<String> getFormattedStartTimes(List<Skier> skiers) {
         List<String> formattedTimes = new ArrayList<>();
-        for (Long time : startTimes) {
-            formattedTimes.add(timeSimulator.formatTime(time));
+        int position = 1; // Första åkaren är på plats 1
+        for (Skier skier : skiers) {
+            String timeStr = timeSimulator.formatTime(skier.getStartTime());
+            String resultLine = "Plats " + position + ": Åkare " + skier.getSkierNumber() + " - " + timeStr;
+            formattedTimes.add(resultLine);
+            position++;
         }
         return formattedTimes;
     }
-    
-
-
 }
-
-
-
-
-
-
-		
