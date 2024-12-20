@@ -103,9 +103,17 @@ public class Skier implements Serializable {
 	public void setRaceTime(long currentTime) {
 		if (currentTime >= startTime && !hasFinished) {
 			this.raceTime = currentTime - startTime;
-		} else {
-			this.raceTime = 0;
-		}
+		} 
+	}
+	
+	public void resetSkier() {
+		this.position = 0;
+		this.raceTime = 0;
+		this.hasFinished = false;
+	    for (int i = 0; i < passedSplitPoints.size(); i++) {
+	        passedSplitPoints.set(i, false);
+	    }
+	    
 	}
 
 	public long getRaceTime() {

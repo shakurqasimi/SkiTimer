@@ -81,6 +81,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		VBox root = new VBox(10);
 		root.setPadding(new Insets(15));
 		
+		
         TextField startNumberInput = new TextField();
         startNumberInput.setPromptText("Ange Åkarnummer");
 
@@ -107,11 +108,13 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 			try {
 				Start.StartType selectedType = startTypeComboBox.getValue();
 
+				double raceSpeedFactor = 10;
+
 				if (selectedType != Start.StartType.PURSUIT_START) {
 				start = new Start(selectedType, skiers);
 				List<String> startTimes = start.getFormattedStartTimes(skiers);
 				resultArea.setText(String.join("\n", startTimes));
-				race.InitializeRace(skiers, 1, result);
+				race.InitializeRace(skiers, raceSpeedFactor, result);
 
 				}
 
@@ -120,7 +123,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 					start = new Start(selectedType, previousSkiers);
 					List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
 					resultArea.setText(String.join("\n", startTimes));
-					race.InitializeRace(previousSkiers, 1, result);
+					race.InitializeRace(previousSkiers, raceSpeedFactor, result);
 				}
 				
 

@@ -66,9 +66,7 @@ public class Start {
                 break;
             case PURSUIT_START:
                 for (Skier skier : skiers) {
-                    skier.setRaceTime(0);
-                    skier.setPreviousTime(0);
-                    skier.setPosition(0);
+                    skier.resetSkier();
                 }
 
 
@@ -78,7 +76,7 @@ public class Start {
     
     
     public void calculatePursuitTimeGaps (List<Skier> previousSkiers) {
-    	long timeGap = previousSkiers.get(0).getStartTime();
+    	long timeGap = 0;
     	previousSkiers.get(0).setStartTime(0);
     	previousSkiers.get(0).setPreviousTime(0);
     	for (int i = 1; i < previousSkiers.size(); i++) {
