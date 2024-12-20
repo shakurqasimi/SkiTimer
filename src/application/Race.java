@@ -29,16 +29,25 @@ public class Race extends Task<Void> {
 		this.result = result;
 
 	}
-	
+
 	public Race() {
-		
+
 	}
-	
+
 	public void InitializeRace(List<Skier> skiers, double speedFactor, Result result) {
 		this.skiers = skiers;
 		this.timeSimulator = new TimeSimulator(speedFactor);
-		this.result = result;	
+		this.result = result;
 	}
+
+	public void resetRace() {
+		for (Skier skier : skiers) {
+			skier.resetSkier();
+		}
+		result.clearResults();
+		
+	}
+
 	@Override
 	protected Void call() throws Exception {
 		raceStartTime = timeSimulator.generateTime();
@@ -60,12 +69,12 @@ public class Race extends Task<Void> {
 
 				}
 				if (skiers.stream().allMatch(Skier::hasFinished)) {
-					//när alla är klara sorteras resultatet för serialisering
+					// när alla är klara sorteras resultatet för serialisering
 					raceFinishTime = timeSimulator.generateTime();
 					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
-
 					Serialization.serialize(skiers, "result.txt");
 					raceFinished = true;
+					resetRace();
 					updateRaceFuture.cancel(false);
 				}
 			}

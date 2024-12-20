@@ -104,6 +104,14 @@ public class Result {
 		}
 	}
 	
+	public void clearResults() {
+		splitTimesSkiNum.clear();
+		splitTimesStartNum.clear();
+		finishTimesSkiNum.clear();
+		finishTimesStartNum.clear();
+		
+	}
+	
 	public void checkFinishLine(Skier skier) {
 		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
 			registerFinishTime(skier.getSkierNumber(), skier.getStartnumber(), skier.getRaceTime());
