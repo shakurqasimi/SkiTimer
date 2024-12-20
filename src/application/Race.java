@@ -1,5 +1,6 @@
 package application;
 
+import javafx.scene.control.TextArea;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,6 +16,7 @@ public class Race extends Task<Void> {
 	private TimeSimulator timeSimulator;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 	private Result result;
+	private TextArea statusArea;
 
 	private boolean raceFinished = false;
 	private boolean raceFinishedFinal = false;
@@ -28,10 +30,11 @@ public class Race extends Task<Void> {
 	private long raceFinishTime;
 	private List<Skier> skiers;
 
-	public Race(List<Skier> skiers, double speedFactor, Result result) throws InterruptedException {
+	public Race(List<Skier> skiers, double speedFactor, Result result, TextArea statusArea) throws InterruptedException {
 		this.skiers = skiers;
 		this.timeSimulator = new TimeSimulator(speedFactor);
 		this.result = result;
+		this.statusArea = statusArea;
 
 	}
 
@@ -87,7 +90,6 @@ public class Race extends Task<Void> {
 					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
 					Serialization.serialize(skiers, "result.txt");
 					raceFinished = true;
-					resetRace();
 					updateRaceFuture.cancel(false);
 					scheduler.shutdownNow();
 
@@ -101,22 +103,25 @@ public class Race extends Task<Void> {
 			Platform.runLater(() -> {
 				// Här skickas UI uppdateringar under körningen (getters)
 				if (!raceFinished) {
-
+					
+                    statusArea.clear();
 					for (Skier skier : skiers) {
+						String updateMessage = "Åkare: " + skier.getSkierNumber() + " har åkt "
+		                        + df.format(skier.getPosition()) + " meter och har åktiden: "
+		                        + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
+						statusArea.appendText(updateMessage);
 						System.out.print("Åkare: " + skier.getSkierNumber() + " har åkt "
 								+ df.format(skier.getPosition()) + " meter");
 						System.out.println(" och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()));
-
-					}
-				}
-				if (raceFinished && !raceFinishedFinal) {
-					result.displayFinalResults();
-					System.out.println(
-							"LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime));
-					raceFinishedFinal = true;
-				}
-
-			});
+		            }
+		        }
+		        if (raceFinished && !raceFinishedFinal) {
+		            result.displayFinalResults();
+		            statusArea.appendText("LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime) + "\n");
+		            raceFinishedFinal = true;
+		            resetRace();
+		        }
+		    });
 		};
 		updateRaceFuture = scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
 		printRaceFuture = scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);
