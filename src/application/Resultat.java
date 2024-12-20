@@ -1,3 +1,4 @@
+
 package application;
 
 import javafx.scene.control.TextArea;
@@ -39,8 +40,7 @@ public class Result {
 		if (!finishTimesSkiNum.containsKey(skierNumber)) {
 			splitTimesSkiNum.put(skierNumber, raceTime);
 			splitTimesStartNum.put(startNumber, raceTime);
-			String message = "Åkare " + skierNumber + " registrerade mellantid vid " + splitPoint + " m: " + formatTime(raceTime) + "\n";
-	        statusArea.appendText(message);
+	
 		}
 	}
 
