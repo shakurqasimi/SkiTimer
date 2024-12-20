@@ -36,11 +36,11 @@ public class Skier implements Serializable {
 		}
 	}
 
-	public int getStartnumber() {
+	public int getStartNumber() {
 		return startNumber;
 	}
 
-	public void setStartnumber(int startnumber) {
+	public void setStartNumber(int startnumber) {
 		startNumber = startnumber;
 	}
 

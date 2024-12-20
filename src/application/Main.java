@@ -104,6 +104,7 @@ public class Main extends Application {
 
 				if (race != null) {
 					race.resetRace();
+                    statusArea.clear();
 					race = null;
 				} else {
 
@@ -122,7 +123,7 @@ public class Main extends Application {
 						start = new Start(selectedType, previousSkiers);
 						List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
 						resultArea.setText(String.join("\n", startTimes));
-						race = new Race();
+						race = new Race(previousSkiers, raceSpeedFactor, result, statusArea);
 						race.InitializeRace(previousSkiers, raceSpeedFactor, result);
 						new Thread(race).start();
 
@@ -211,6 +212,7 @@ public class Main extends Application {
 				for (int j = 0; j < splitTimesStartNum.size(); j++) {
 					if (splitTimesStartNum.get(j).getKey() == startNumber) {
 						place = j + 1;
+						resultArea.appendText("________________________" + "\n ");
 						resultArea
 								.appendText("Åkare " + splitTimesStartNum.get(j).getKey() + " har placering " + place);
 						break;
@@ -238,7 +240,7 @@ public class Main extends Application {
                 loadPreviousResultsButton
         );
 
-        Scene scene = new Scene(root, 400, 600);
+        Scene scene = new Scene(root, 450, 600);
         primaryStage.setTitle("Starttidshantering");
         primaryStage.setScene(scene);
         primaryStage.show();

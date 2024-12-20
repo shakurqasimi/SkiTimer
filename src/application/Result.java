@@ -113,7 +113,7 @@ public class Result {
 	
 	public void checkFinishLine(Skier skier) {
 		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
-			registerFinishTime(skier.getSkierNumber(), skier.getStartnumber(), skier.getRaceTime());
+			registerFinishTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime());
 			skier.setHasFinished(true);
 			System.out
 					.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID " + df.format(skier.getPosition()) + " METER");
@@ -125,7 +125,7 @@ public class Result {
 		for (int i = 0; i < track.getSplitPoints().size(); i++) {
 			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
-				registerSplitTime(skier.getSkierNumber(), skier.getStartnumber(), skier.getRaceTime(), track.getSplitPoint(i));
+				registerSplitTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime(), track.getSplitPoint(i));
 			}
 		}
 	}

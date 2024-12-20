@@ -106,7 +106,7 @@ public class Race extends Task<Void> {
 					
                     statusArea.clear();
 					for (Skier skier : skiers) {
-						String updateMessage = "Åkare: " + skier.getSkierNumber() + " har åkt "
+						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()  +" har åkt "
 		                        + df.format(skier.getPosition()) + " meter och har åktiden: "
 		                        + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
 						statusArea.appendText(updateMessage);
