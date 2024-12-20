@@ -1,87 +1,131 @@
-import java.time.LocalTime;
-import java.util.ArrayList;
+package application;
+
+import javafx.scene.control.TextArea;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Result {
-    private int athleteNumber;
-    private LocalTime startTime;
-    private List<CheckpointTime> splitTimes;
-    private LocalTime finishTime;
 
-    public Result(int athleteNumber, LocalTime startTime) {
-        this.athleteNumber = athleteNumber;
-        this.startTime = startTime;
-        this.splitTimes = new ArrayList<>();
-        this.finishTime = null;
-    }
+	private Map<Integer, Long> splitTimesSkiNum; 
+	private Map<Integer, Long> splitTimesStartNum;
 
-    public void addSplitTime(int checkpoint, LocalTime splitTime) {
-        splitTimes.add(new CheckpointTime(checkpoint,splittime));
-    }
+	private Map<Integer, Long> finishTimesSkiNum;
+	private Map<Integer, Long> finishTimesStartNum;
 
-    public void setFinishTime(LocalTime finishTime) {
-        this.finishTime = finishTime;
-    }
+	
+	private static final DecimalFormat df = new DecimalFormat("0.00");
+	private TextArea resultArea; 
+	private Result result;
+	private SkiTrack track;
+	private TextArea statusArea;
 
-    public String getCurrentRaceTime(LocalTime currentTime) {
-        if (startTime == null) {
-            return "Starttid saknas!";
-        }
-        long elapsedSeconds = java.time.Duration.between(startTime, currentTime).getSeconds();
-        return formatTime(elapsedSeconds);
-    }
+	public Result(SkiTrack track, TextArea resultArea, TextArea statusArea) { 
+		this.splitTimesSkiNum = new HashMap<>();
+		this.splitTimesStartNum = new HashMap<>();
 
-    public String getFinalRaceTime() {
-        if (finishTime == null || startTime == null) {
-            return "Tid ej tillgänglig.";
-        }
-        long elapsedSeconds = java.time.Duration.between(startTime, finishTime).getSeconds();
-        return formatTime(elapsedSeconds);
-    }
+		this.finishTimesSkiNum = new HashMap<>();
+		this.finishTimesStartNum = new HashMap<>();
 
-    private String formatTime(long totalSeconds) {
-        long hours = totalSeconds / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
+		this.track = track;
+		this.resultArea = resultArea; 
+		this.statusArea = statusArea;
+	}
 
-    public int getAthleteNumber() {
-        return athleteNumber;
-    }
+	// mellantid (100 m)
+	public void registerSplitTime(int skierNumber, int startNumber, long raceTime, double splitPoint) {
+		if (!finishTimesSkiNum.containsKey(skierNumber)) {
+			splitTimesSkiNum.put(skierNumber, raceTime);
+			splitTimesStartNum.put(startNumber, raceTime);
+			String message = "Åkare " + skierNumber + " registrerade mellantid vid " + splitPoint + " m: " + formatTime(raceTime) + "\n";
+	        statusArea.appendText(message);
+		}
+	}
 
-    public List<CheckpointTime> getSplitTimes() {
-        return splitTimes;
-    }
+	// sluttid (20 km)
+	public void registerFinishTime(int skierNumber, int startNumber, long raceTime) {
+		if (!finishTimesSkiNum.containsKey(skierNumber)) {
+			finishTimesSkiNum.put(skierNumber, raceTime);
+			finishTimesStartNum.put(startNumber, raceTime);
 
-    public LocalTime getStartTime() {
-        return startTime;
-    }
+		}
+	}
 
-    public LocalTime getFinishTime() {
-        return finishTime;
-    }
-    public static class CheckpointTime {
-        private int checkpointDistance;
-        private LocaleTime time;
+	public String getSplitTime(int skierNumber) {
+		if (splitTimesSkiNum.containsKey(skierNumber)) {
+			return formatTime(splitTimesSkiNum.get(skierNumber));
+		}
+		return "Mellantid ej registrerad";
+	}
 
-        public CheckpointTime (int checkpointDistance, LocalTime time){
-            this.checkpointDistance = checkpointDistance;
-            this.time = time;
-        }
+	public String getFinishTime(int skierNumber) {
+		if (finishTimesSkiNum.containsKey(skierNumber)) {
+			return formatTime(finishTimesSkiNum.get(skierNumber));
+		}
+		return "Sluttid ej registrerad";
+	}
 
-        public int getCheckpointDistance() {
-            return checkpointDistance;
-        }
+	public Map<Integer, Long> getSplitTimesStartNum() {
+		return splitTimesStartNum;
+	}
 
-        public LocalTime getTime() {
-            return time;
-        }
+	public Map<Integer, Long> getFinishTimesStartNum() {
+		return finishTimesStartNum;
+	}
 
-        @Override
-        public String toString() {
-            return "Checkpoint " + checkpointDistance + " m: " + time.toString();
-        }
-    }
+	private String formatTime(long milliseconds) {
+		Duration duration = Duration.ofMillis(milliseconds);
+		long minutes = duration.toMinutes();
+		long seconds = duration.getSeconds() % 60;
+		long millis = duration.toMillisPart();
+		return String.format("%02d:%02d.%03d", minutes, seconds, millis);
+	}
 
+	public void displayResults() {
+		StringBuilder sb = new StringBuilder();
+
+		for (int skierNumber : splitTimesSkiNum.keySet()) {
+			sb.append("Åkare ").append(skierNumber).append(":\n");
+			sb.append("Mellantid: ").append(getSplitTime(skierNumber)).append("\n");
+			sb.append("Sluttid: ").append(getFinishTime(skierNumber)).append("\n");
+			sb.append("------------------------------\n");
+		}
+
+		resultArea.setText(sb.toString());
+	}
+	
+	public void clearResults() {
+		splitTimesSkiNum.clear();
+		splitTimesStartNum.clear();
+		finishTimesSkiNum.clear();
+		finishTimesStartNum.clear();
+		
+	}
+	
+	public void displayFinalResults() {
+		System.out.println("Slutresultat (sorterat efter sluttid):");
+		finishTimesSkiNum.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.forEach(entry -> System.out.println("Åkare " + entry.getKey() + ": " + formatTime(entry.getValue())));
+	}
+	
+	public void checkFinishLine(Skier skier) {
+		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
+			registerFinishTime(skier.getSkierNumber(), skier.getStartnumber(), skier.getRaceTime());
+			skier.setHasFinished(true);
+			System.out
+					.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID " + df.format(skier.getPosition()) + " METER");
+
+		}
+	}
+	public void checkSplitPoints(Skier skier) {
+		List<Boolean> passedSplitPoints = skier.getPassedSplitPoints();
+		for (int i = 0; i < track.getSplitPoints().size(); i++) {
+			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
+				passedSplitPoints.set(i, true);
+				registerSplitTime(skier.getSkierNumber(), skier.getStartnumber(), skier.getRaceTime(), track.getSplitPoint(i));
+			}
+		}
+	}
 }
