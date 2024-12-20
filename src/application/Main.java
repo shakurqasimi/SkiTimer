@@ -101,6 +101,11 @@ public class Main extends Application {
 				Start.StartType selectedType = startTypeComboBox.getValue();
 
 				double raceSpeedFactor = 10;
+				
+				if (race.hasFinished()) {
+					race.resetRace();
+					race = null;;
+				}
 
 				if (race != null) {
 					race.resetRace();

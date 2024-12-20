@@ -91,7 +91,6 @@ public class Race extends Task<Void> {
 					Serialization.serialize(skiers, "result.txt");
 					raceFinished = true;
 					updateRaceFuture.cancel(false);
-					scheduler.shutdownNow();
 
 				}
 			}
