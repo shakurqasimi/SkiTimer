@@ -15,9 +15,14 @@ public class Race extends Task<Void> {
 	private TimeSimulator timeSimulator;
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 	private Result result;
-	private ScheduledFuture<?> updateRaceFuture;
+
 	private boolean raceFinished = false;
 	private boolean raceFinishedFinal = false;
+
+	private Runnable updateRace;
+	private Runnable printRace;
+	private ScheduledFuture<?> updateRaceFuture;
+	private ScheduledFuture<?> printRaceFuture;
 
 	private long raceStartTime;
 	private long raceFinishTime;
@@ -33,7 +38,7 @@ public class Race extends Task<Void> {
 	public Race() {
 
 	}
-	
+
 	public boolean hasFinished() {
 		return raceFinished;
 	}
@@ -43,14 +48,17 @@ public class Race extends Task<Void> {
 		this.timeSimulator = new TimeSimulator(speedFactor);
 		this.result = result;
 	}
-	
 
 	public void resetRace() {
+
 		for (Skier skier : skiers) {
 			skier.resetSkier();
 		}
+
 		result.clearResults();
-	    scheduler.shutdownNow();		
+		updateRaceFuture.cancel(false);
+		printRaceFuture.cancel(false);
+		scheduler.shutdownNow();
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public class Race extends Task<Void> {
 
 		scheduler = Executors.newScheduledThreadPool(2);
 
-		Runnable updateRace = () -> {
+		updateRace = () -> {
 			synchronized (skiers) {
 
 				for (Skier skier : skiers) {
@@ -81,12 +89,14 @@ public class Race extends Task<Void> {
 					raceFinished = true;
 					resetRace();
 					updateRaceFuture.cancel(false);
+					scheduler.shutdownNow();
+
 				}
 			}
 
 		};
 
-		Runnable printRace = () -> {
+		printRace = () -> {
 
 			Platform.runLater(() -> {
 				// Här skickas UI uppdateringar under körningen (getters)
@@ -108,8 +118,8 @@ public class Race extends Task<Void> {
 
 			});
 		};
-		scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
-		scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);
+		updateRaceFuture = scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
+		printRaceFuture = scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);
 
 		return null;
 

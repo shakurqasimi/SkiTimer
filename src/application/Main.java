@@ -30,8 +30,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 	private List<Skier> previousSkiers;
-	private Race race; 
-
+	private Race race;
+	private SkiTrack track;
 	private Start start;
 
 	@Override
@@ -39,7 +39,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 
 		List<Double> splitPointPositions = new ArrayList<Double>();
 		splitPointPositions.add(100.0); // Sätt checkpoints inom banan
-		SkiTrack track = new SkiTrack();
+		track = new SkiTrack();
 		track.setTrackLength(1000);
 		track.setSplitPoints(splitPointPositions);
 
@@ -69,7 +69,6 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 		skiers.add(skier8);
 		skiers.add(skier9);
 		skiers.add(skier10);
-
 
 		Result result = new Result(track);
 		Button showSplitsButton = new Button("Visa Mellantider");
@@ -105,31 +104,32 @@ public class Main extends Application implements EventHandler<ActionEvent> {
 				Start.StartType selectedType = startTypeComboBox.getValue();
 
 				double raceSpeedFactor = 10;
-				
+
 				if (race != null) {
-		            race.resetRace(); 
-		            }
+					race.resetRace();
+					race = null;
+				} else {
 
-				if (selectedType != Start.StartType.PURSUIT_START) {
-					start = new Start(selectedType, skiers);
-					List<String> startTimes = start.getFormattedStartTimes(skiers);
-					resultArea.setText(String.join("\n", startTimes));
-					race = new Race();
-					race.InitializeRace(skiers, raceSpeedFactor, result);
-					Thread raceThread = new Thread(race);
-					raceThread.setDaemon(true);
-					new Thread(race).start();
-				}
+					if (selectedType != Start.StartType.PURSUIT_START) {
+						start = new Start(selectedType, skiers);
+						List<String> startTimes = start.getFormattedStartTimes(skiers);
+						resultArea.setText(String.join("\n", startTimes));
 
-				if (selectedType == Start.StartType.PURSUIT_START) {
-					start = new Start(selectedType, previousSkiers);
-					List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
-					resultArea.setText(String.join("\n", startTimes));
-					race = new Race();
-					race.InitializeRace(previousSkiers, raceSpeedFactor, result);
-					Thread raceThread = new Thread(race);
-					raceThread.setDaemon(true);
-					new Thread(race).start();
+						race = new Race();
+
+						race.InitializeRace(skiers, raceSpeedFactor, result);
+						new Thread(race).start();
+					}
+
+					if (selectedType == Start.StartType.PURSUIT_START) {
+						start = new Start(selectedType, previousSkiers);
+						List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
+						resultArea.setText(String.join("\n", startTimes));
+						race = new Race();
+						race.InitializeRace(previousSkiers, raceSpeedFactor, result);
+						new Thread(race).start();
+
+					}
 				}
 
 			} catch (Exception e) {

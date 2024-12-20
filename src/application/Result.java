@@ -14,6 +14,7 @@ public class Result {
 
 	private Map<Integer, Long> finishTimesSkiNum;
 	private Map<Integer, Long> finishTimesStartNum;
+	private Result result;
 
 	
 	private SkiTrack track;
@@ -26,9 +27,13 @@ public class Result {
 
 		this.finishTimesSkiNum = new HashMap<>();
 		this.finishTimesStartNum = new HashMap<>();
-
+		this.result = result;
 		this.track = track;
 
+	}
+	
+	public Result() {
+		
 	}
 
 	// mellantid (100 m)
