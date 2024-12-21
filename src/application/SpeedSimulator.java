@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class SpeedSimulator {
 	
-	public double generateSpeed(double trackLength) {
+	public static double generateSpeed(double trackLength) {
 
 		Random random = new Random();
 		double maxSpeed = 0;
@@ -30,7 +30,7 @@ public class SpeedSimulator {
 
 	}
 
-	public double convertSpeed(double kmPerH) {
+	public static double convertSpeed(double kmPerH) {
 		// Omvandlar km/t till m/s
 		double mPerS = kmPerH / 3.6;
 

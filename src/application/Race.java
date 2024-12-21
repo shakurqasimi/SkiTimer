@@ -19,7 +19,6 @@ public class Race extends Task<Void> {
 	private TextArea statusArea;
 
 	private boolean raceFinished = false;
-	private boolean raceFinishedFinal = false;
 
 	private Runnable updateRace;
 	private Runnable printRace;
@@ -30,7 +29,8 @@ public class Race extends Task<Void> {
 	private long raceFinishTime;
 	private List<Skier> skiers;
 
-	public Race(List<Skier> skiers, double speedFactor, Result result, TextArea statusArea) throws InterruptedException {
+	public Race(List<Skier> skiers, double speedFactor, Result result, TextArea statusArea)
+			throws InterruptedException {
 		this.skiers = skiers;
 		this.timeSimulator = new TimeSimulator(speedFactor);
 		this.result = result;
@@ -54,13 +54,12 @@ public class Race extends Task<Void> {
 
 	public void resetRace() {
 
+		updateRaceFuture.cancel(false);
+		printRaceFuture.cancel(false);
+		result.clearResults();
 		for (Skier skier : skiers) {
 			skier.resetSkier();
 		}
-
-		result.clearResults();
-		updateRaceFuture.cancel(false);
-		printRaceFuture.cancel(false);
 		scheduler.shutdownNow();
 	}
 
@@ -101,26 +100,27 @@ public class Race extends Task<Void> {
 
 			Platform.runLater(() -> {
 				// Här skickas UI uppdateringar under körningen (getters)
-				if (!raceFinished) {
-					
-                    statusArea.clear();
+			
+
+					statusArea.clear();
 					for (Skier skier : skiers) {
-						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()  +" har åkt "
-		                        + df.format(skier.getPosition()) + " meter och har åktiden: "
-		                        + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
+						skier.setSpeed(SpeedSimulator.generateSpeed(SkiTrack.getTrackLength()));
+						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: "
+								+ skier.getStartNumber() + " har åkt " + df.format(skier.getPosition())
+								+ " meter och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
 						statusArea.appendText(updateMessage);
 						System.out.print("Åkare: " + skier.getSkierNumber() + " har åkt "
 								+ df.format(skier.getPosition()) + " meter");
 						System.out.println(" och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()));
-		            }
-		        }
-		        if (raceFinished && !raceFinishedFinal) {
-		            result.displayFinalResults();
-		            statusArea.appendText("LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime) + "\n");
-		            raceFinishedFinal = true;
-		            resetRace();
-		        }
-		    });
+					}
+			
+				if (raceFinished) {
+					result.displayFinalResults(skiers);
+					statusArea.appendText(
+							"LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime) + "\n");
+					resetRace();
+				}
+			});
 		};
 		updateRaceFuture = scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
 		printRaceFuture = scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);

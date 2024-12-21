@@ -11,20 +11,19 @@ import java.util.stream.Collectors;
 
 public class Result {
 
-	private Map<Integer, Long> splitTimesSkiNum; 
+	private Map<Integer, Long> splitTimesSkiNum;
 	private Map<Integer, Long> splitTimesStartNum;
 
 	private Map<Integer, Long> finishTimesSkiNum;
 	private Map<Integer, Long> finishTimesStartNum;
 
-	
 	private static final DecimalFormat df = new DecimalFormat("0.00");
-	private TextArea resultArea; 
+	private TextArea resultArea;
 	private Result result;
 	private SkiTrack track;
 	private TextArea statusArea;
 
-	public Result(SkiTrack track, TextArea resultArea, TextArea statusArea) { 
+	public Result(SkiTrack track, TextArea resultArea, TextArea statusArea) {
 		this.splitTimesSkiNum = new HashMap<>();
 		this.splitTimesStartNum = new HashMap<>();
 
@@ -32,7 +31,7 @@ public class Result {
 		this.finishTimesStartNum = new HashMap<>();
 
 		this.track = track;
-		this.resultArea = resultArea; 
+		this.resultArea = resultArea;
 		this.statusArea = statusArea;
 	}
 
@@ -41,7 +40,7 @@ public class Result {
 		if (!finishTimesSkiNum.containsKey(skierNumber)) {
 			splitTimesSkiNum.put(skierNumber, raceTime);
 			splitTimesStartNum.put(startNumber, raceTime);
-	
+
 		}
 	}
 
@@ -96,43 +95,49 @@ public class Result {
 
 		resultArea.setText(sb.toString());
 	}
-	
+
 	public void clearResults() {
 		splitTimesSkiNum.clear();
 		splitTimesStartNum.clear();
 		finishTimesSkiNum.clear();
 		finishTimesStartNum.clear();
-		
+
 	}
-	
-	public void displayFinalResults() {
+
+	public void displayFinalResults(List<Skier> skiers) {
 		System.out.println("Slutresultat (sorterat efter sluttid):");
-		finishTimesSkiNum.entrySet().stream().sorted(Map.Entry.comparingByValue())
-				.forEach(entry -> System.out.println("Åkare " + entry.getKey() + ": " + formatTime(entry.getValue())));
+		resultArea.appendText("\n " + "Slutresultat (sorterat efter sluttid):"+ "\n ");
+		for (Skier skier : skiers) {
+			System.out.println("Åkarnum: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()
+					+ ", åktid: " + formatTime(skier.getRaceTime()));
+			resultArea.appendText("Åkarnum: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()
+					+ ", åktid: " + formatTime(skier.getRaceTime())+ "\n ");
+		}
+
 	}
-	
+
 	public void checkFinishLine(Skier skier) {
 		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
 			registerFinishTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime());
 			skier.setHasFinished(true);
-			System.out
-					.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID " + df.format(skier.getPosition()) + " METER");
+			System.out.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID "
+					+ df.format(skier.getPosition()) + " METER");
 
 		}
 	}
+
 	public void checkSplitPoints(Skier skier) {
 		List<Boolean> passedSplitPoints = skier.getPassedSplitPoints();
 		for (int i = 0; i < track.getSplitPoints().size(); i++) {
 			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
-				registerSplitTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime(), track.getSplitPoint(i));
+				registerSplitTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime(),
+						track.getSplitPoint(i));
 			}
 		}
 	}
-	
+
 	public List<Map.Entry<Integer, Long>> getSortedSplitTimes() {
-	return splitTimesStartNum.entrySet().stream()
-	        .sorted(Map.Entry.comparingByValue()) 
-	        .collect(Collectors.toList());
+		return splitTimesStartNum.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
 	}
 }

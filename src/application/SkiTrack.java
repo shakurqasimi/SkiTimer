@@ -6,14 +6,13 @@ import java.util.List;
 
 public class SkiTrack {
 
-	private double trackLength;
+	private static double trackLength;
 	private List<Double> splitPoints;
 
 	public SkiTrack() {
 	}
 
 	public SkiTrack(double trackLength, List<Double> splitPointPositions) {
-		this.trackLength = trackLength;
 		this.splitPoints = new ArrayList<Double>();
 	}
 
@@ -22,7 +21,7 @@ public class SkiTrack {
 
 	}
 
-	public double getTrackLength() {
+	public static double getTrackLength() {
 		return trackLength;
 	}
 
