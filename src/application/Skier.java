@@ -23,11 +23,10 @@ public class Skier implements Serializable {
 	public Skier() {
 	}
 
-	public Skier(int startnumber, int skierNumber, double speed, SkiTrack skiTrack) {
+	public Skier(int startnumber, int skierNumber, double speed) {
 		this.skierNumber = skierNumber;
 		this.startNumber = startnumber;
 		this.speed = speed;
-		this.track = skiTrack;
 		this.passedSplitPoints = new ArrayList<>(track.getSplitPoints().size());
 		this.hasFinished = false;
 

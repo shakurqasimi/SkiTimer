@@ -24,6 +24,8 @@ public class Main extends Application {
 	private static final TextArea resultArea = new TextArea();
 	private TextArea statusArea;
 	private TextArea splitArea;
+	
+	
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -33,17 +35,18 @@ public class Main extends Application {
 		track.setSplitPoints(splitPointPositions);
 
 		List<Skier> skiers = new ArrayList<Skier>();
+		
 
-		Skier skier1 = new Skier(1, 12, SpeedSimulator.generateSpeed(), track);
-		Skier skier2 = new Skier(2, 23, SpeedSimulator.generateSpeed(), track);
-		Skier skier3 = new Skier(3, 83, SpeedSimulator.generateSpeed(), track);
-		Skier skier4 = new Skier(4, 77, SpeedSimulator.generateSpeed(), track);
-		Skier skier5 = new Skier(5, 91, SpeedSimulator.generateSpeed(), track);
-		Skier skier6 = new Skier(6, 14, SpeedSimulator.generateSpeed(), track);
-		Skier skier7 = new Skier(7, 22, SpeedSimulator.generateSpeed(), track);
-		Skier skier8 = new Skier(8, 54, SpeedSimulator.generateSpeed(), track);
-		Skier skier9 = new Skier(9, 38, SpeedSimulator.generateSpeed(), track);
-		Skier skier10 = new Skier(10, 46, SpeedSimulator.generateSpeed(), track);
+		Skier skier1 = new Skier(1, 12, SpeedSimulator.generateSpeed());
+		Skier skier2 = new Skier(2, 23, SpeedSimulator.generateSpeed());
+		Skier skier3 = new Skier(3, 83, SpeedSimulator.generateSpeed());
+		Skier skier4 = new Skier(4, 77, SpeedSimulator.generateSpeed());
+		Skier skier5 = new Skier(5, 91, SpeedSimulator.generateSpeed());
+		Skier skier6 = new Skier(6, 14, SpeedSimulator.generateSpeed());
+		Skier skier7 = new Skier(7, 22, SpeedSimulator.generateSpeed());
+		Skier skier8 = new Skier(8, 54, SpeedSimulator.generateSpeed());
+		Skier skier9 = new Skier(9, 38, SpeedSimulator.generateSpeed());
+		Skier skier10 = new Skier(10, 46, SpeedSimulator.generateSpeed());
 
 		start = new Start();
 
@@ -222,24 +225,24 @@ public class Main extends Application {
 				int startNumber = Integer.parseInt(startNumberInput.getText().trim());
 				int place = 0;
 				List<Map.Entry<Integer, Long>> splitTimesStartNum = result.getSortedSplitTimes();
-				resultArea.setText("Mellantider för åkare " + startNumber + ":\n");
+				splitArea.appendText("Mellantider för åkare " + startNumber + ":\n");
 				for (int i = 0; i < splitTimesStartNum.size(); i++) {
 					Map.Entry<Integer, Long> entry = splitTimesStartNum.get(i);
-					resultArea.appendText("Åkare " + entry.getKey() + " Plats: " + (i + 1) + ": "
+					splitArea.appendText("Åkare " + entry.getKey() + " Plats: " + (i + 1) + ": "
 							+ result.formatTime(entry.getValue()) + "\n ");
 				}
 				for (int j = 0; j < splitTimesStartNum.size(); j++) {
 					if (splitTimesStartNum.get(j).getKey() == startNumber) {
 						place = j + 1;
-						resultArea.appendText("___________________________" + "\n ");
-						resultArea
+						splitArea.appendText("___________________________" + "\n ");
+						splitArea
 								.appendText("Åkare " + splitTimesStartNum.get(j).getKey() + " har placering " + place);
 						break;
 					}
 
 				}
 			} catch (NumberFormatException e) {
-				resultArea.setText("Fel: Ogiltigt startnummer.");
+				splitArea.setText("Fel: Ogiltigt startnummer.");
 			}
 		});
 

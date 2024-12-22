@@ -7,13 +7,13 @@ import java.util.List;
 public class SkiTrack {
 
 	private static double trackLength;
-	private List<Double> splitPoints;
+	private static List<Double> splitPoints;
 
 	public SkiTrack() {
 	}
 
 	public SkiTrack(double trackLength, List<Double> splitPointPositions) {
-		this.splitPoints = new ArrayList<Double>();
+		splitPoints = new ArrayList<Double>();
 	}
 
 	public static void setTrackLength(double trackLengthInput) {
@@ -31,11 +31,11 @@ public class SkiTrack {
 				throw new IllegalArgumentException("Stationen ligger utanför spåret");
 			}
 		}
-		this.splitPoints = new ArrayList<>(splitPointPositions);
-		Collections.sort(this.splitPoints);
+		splitPoints = new ArrayList<>(splitPointPositions);
+		Collections.sort(splitPoints);
 	}
 
-	public List<Double> getSplitPoints() {
+	public static List<Double> getSplitPoints() {
 		return splitPoints;
 	}
 	
