@@ -117,7 +117,7 @@ public class Result {
 	}
 
 	public void checkFinishLine(Skier skier) {
-		if (!skier.hasFinished() && skier.getPosition() >= track.getTrackLength()) {
+		if (!skier.hasFinished() && skier.getPosition() >= SkiTrack.getTrackLength()) {
 			registerFinishTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime());
 			skier.setHasFinished(true);
 			System.out.println("ÅKARE " + skier.getSkierNumber() + " HAR PASSERAT MÅLLINJEN VID "

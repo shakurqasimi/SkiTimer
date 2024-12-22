@@ -16,8 +16,8 @@ public class SkiTrack {
 		this.splitPoints = new ArrayList<Double>();
 	}
 
-	public void setTrackLength(double trackLength) {
-		this.trackLength = trackLength;
+	public static void setTrackLength(double trackLengthInput) {
+		trackLength = trackLengthInput;
 
 	}
 

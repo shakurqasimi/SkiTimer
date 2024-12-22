@@ -4,7 +4,8 @@ import java.util.Random;
 
 public class SpeedSimulator {
 	
-	public static double generateSpeed(double trackLength) {
+	public static double generateSpeed() {
+		double trackLength = SkiTrack.getTrackLength();
 
 		Random random = new Random();
 		double maxSpeed = 0;

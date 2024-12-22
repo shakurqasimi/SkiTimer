@@ -54,12 +54,12 @@ public class Race extends Task<Void> {
 
 	public void resetRace() {
 
-		updateRaceFuture.cancel(false);
-		printRaceFuture.cancel(false);
-		result.clearResults();
+
 		for (Skier skier : skiers) {
 			skier.resetSkier();
 		}
+		updateRaceFuture.cancel(false);
+		printRaceFuture.cancel(false);
 		scheduler.shutdownNow();
 	}
 
@@ -88,6 +88,7 @@ public class Race extends Task<Void> {
 					raceFinishTime = timeSimulator.generateTime();
 					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
 					Serialization.serialize(skiers, "result.txt");
+					result.displayFinalResults(skiers);
 					raceFinished = true;
 					updateRaceFuture.cancel(false);
 
@@ -104,7 +105,9 @@ public class Race extends Task<Void> {
 
 					statusArea.clear();
 					for (Skier skier : skiers) {
-						skier.setSpeed(SpeedSimulator.generateSpeed(SkiTrack.getTrackLength()));
+						if (!skier.hasFinished()) {
+							skier.setSpeed(SpeedSimulator.generateSpeed());
+							}
 						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: "
 								+ skier.getStartNumber() + " har åkt " + df.format(skier.getPosition())
 								+ " meter och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
@@ -115,7 +118,6 @@ public class Race extends Task<Void> {
 					}
 			
 				if (raceFinished) {
-					result.displayFinalResults(skiers);
 					statusArea.appendText(
 							"LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime) + "\n");
 					resetRace();

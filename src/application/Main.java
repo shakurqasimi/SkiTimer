@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.geometry.Insets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,53 +21,47 @@ public class Main extends Application {
 	private static final SkiTrack track = new SkiTrack();
 	private Start start;
 	private Result result;
-    private static final TextArea resultArea = new TextArea();
+	private static final TextArea resultArea = new TextArea();
 	private TextArea statusArea;
+	private TextArea splitArea;
 
 	@Override
 	public void start(Stage primaryStage) {
 		List<Double> splitPointPositions = new ArrayList<Double>();
 		splitPointPositions.add(100.0);
-		track.setTrackLength(1000);
+		SkiTrack.setTrackLength(1000);
 		track.setSplitPoints(splitPointPositions);
 
 		List<Skier> skiers = new ArrayList<Skier>();
 
-		Skier skier1 = new Skier(1, 12, SpeedSimulator.generateSpeed(0), track);
-		Skier skier2 = new Skier(2, 23, SpeedSimulator.generateSpeed(0), track);
-		Skier skier3 = new Skier(3, 83, SpeedSimulator.generateSpeed(0), track);
-		Skier skier4 = new Skier(4, 77, SpeedSimulator.generateSpeed(0), track);
-		Skier skier5 = new Skier(5, 91, SpeedSimulator.generateSpeed(0), track);
-		Skier skier6 = new Skier(6, 14, SpeedSimulator.generateSpeed(0), track);
-		Skier skier7 = new Skier(7, 22, SpeedSimulator.generateSpeed(0), track);
-		Skier skier8 = new Skier(8, 54, SpeedSimulator.generateSpeed(0), track);
-		Skier skier9 = new Skier(9, 38, SpeedSimulator.generateSpeed(0), track);
-		Skier skier10 = new Skier(10, 46, SpeedSimulator.generateSpeed(0), track);
+		Skier skier1 = new Skier(1, 12, SpeedSimulator.generateSpeed(), track);
+		Skier skier2 = new Skier(2, 23, SpeedSimulator.generateSpeed(), track);
+		Skier skier3 = new Skier(3, 83, SpeedSimulator.generateSpeed(), track);
+		Skier skier4 = new Skier(4, 77, SpeedSimulator.generateSpeed(), track);
+		Skier skier5 = new Skier(5, 91, SpeedSimulator.generateSpeed(), track);
+		Skier skier6 = new Skier(6, 14, SpeedSimulator.generateSpeed(), track);
+		Skier skier7 = new Skier(7, 22, SpeedSimulator.generateSpeed(), track);
+		Skier skier8 = new Skier(8, 54, SpeedSimulator.generateSpeed(), track);
+		Skier skier9 = new Skier(9, 38, SpeedSimulator.generateSpeed(), track);
+		Skier skier10 = new Skier(10, 46, SpeedSimulator.generateSpeed(), track);
 
 		start = new Start();
 
-		skiers.add(skier1);
-		skiers.add(skier2);
-		skiers.add(skier3);
-		skiers.add(skier4);
-		skiers.add(skier5);
-		skiers.add(skier6);
-		skiers.add(skier7);
-		skiers.add(skier8);
-		skiers.add(skier9);
-		skiers.add(skier10);
+		skiers.addAll(Arrays.asList(skier1, skier2, skier3, skier4, skier5, skier6, skier7, skier8, skier9, skier10));
 
-		Button showSplitsButton = new Button("Visa Mellantider");
 		List<Integer> timeGaps = new ArrayList<>();
 		List<Long> previousTimes = new ArrayList<>();
 
-		start = new Start();
-		result = new Result(track, resultArea, statusArea);
+		result = new Result(track, resultArea, resultArea);
 		statusArea = new TextArea();
 		statusArea.setEditable(false);
-		statusArea.setPrefHeight(300);
+		statusArea.setPrefHeight(150);
 		resultArea.setEditable(false);
-		resultArea.setPrefHeight(300);
+		resultArea.setPrefHeight(150);
+		splitArea = new TextArea();
+		splitArea.setEditable(false);
+		splitArea.setPrefHeight(150);
+		
 
 		VBox root = new VBox(10);
 		root.setPadding(new Insets(15));
@@ -77,6 +72,15 @@ public class Main extends Application {
 		ComboBox<Start.StartType> startTypeComboBox = new ComboBox<>();
 		startTypeComboBox.getItems().addAll(Start.StartType.values());
 		startTypeComboBox.setValue(Start.StartType.INDIVIDUAL_15);
+		
+        TextField trackLengthInput = new TextField();//Fält för att ange banlängden i meter.j
+        trackLengthInput.setPromptText("Ange banlängd (meter)");
+
+        TextField splitPointsInput = new TextField();
+        splitPointsInput.setPromptText("Ange mellantidsstationer (kommaseparerat)");
+
+        TextField raceSpeedFactorInput = new TextField();
+        raceSpeedFactorInput.setPromptText("Ange hastighetsfaktor");
 
 		Button generateButton = new Button("Starta/Stoppa lopp");
 
@@ -93,9 +97,29 @@ public class Main extends Application {
 				Start.StartType selectedType = startTypeComboBox.getValue();
 
 				double raceSpeedFactor = 10;
+	             if (!raceSpeedFactorInput.getText().isEmpty()) {
+	                    raceSpeedFactor = Double.parseDouble(raceSpeedFactorInput.getText().trim());
+	                }
+
+	                if (!trackLengthInput.getText().isEmpty()) {
+	                    int trackLength = Integer.parseInt(trackLengthInput.getText().trim());
+	                    SkiTrack.setTrackLength(trackLength);
+	                }
+
+	                if (!splitPointsInput.getText().isEmpty()) {
+	                    String[] splits = splitPointsInput.getText().trim().split(",");
+	                    List<Double> newSplits = new ArrayList<>();
+	                    for (String split : splits) {
+	                        newSplits.add(Double.parseDouble(split.trim()));
+	                    }
+	                    track.setSplitPoints(newSplits);
+	                }
 
 				if (race != null && race.hasFinished()) {
 					race.resetRace();
+					statusArea.clear();
+					splitArea.clear();
+					result.clearResults();
 					race = null;
 					// gör så att man inte behöver trycka start två gånger efter avslutat lopp
 				}
@@ -103,6 +127,8 @@ public class Main extends Application {
 				if (race != null) {
 					race.resetRace();
 					statusArea.clear();
+					splitArea.clear();
+					result.clearResults();
 					race = null;
 				} else {
 
@@ -190,7 +216,7 @@ public class Main extends Application {
 				resultArea.setText("Fel vid hämtning av åkare: " + e.getMessage());
 			}
 		});
-
+		Button showSplitsButton = new Button("Visa Mellantider");
 		showSplitsButton.setOnAction(event -> {
 			try {
 				int startNumber = Integer.parseInt(startNumberInput.getText().trim());
@@ -199,8 +225,8 @@ public class Main extends Application {
 				resultArea.setText("Mellantider för åkare " + startNumber + ":\n");
 				for (int i = 0; i < splitTimesStartNum.size(); i++) {
 					Map.Entry<Integer, Long> entry = splitTimesStartNum.get(i);
-					resultArea
-							.appendText("Åkare " + entry.getKey() + " Plats: " + (i+1) + ": " + result.formatTime(entry.getValue()) +  "\n ");
+					resultArea.appendText("Åkare " + entry.getKey() + " Plats: " + (i + 1) + ": "
+							+ result.formatTime(entry.getValue()) + "\n ");
 				}
 				for (int j = 0; j < splitTimesStartNum.size(); j++) {
 					if (splitTimesStartNum.get(j).getKey() == startNumber) {
@@ -217,9 +243,10 @@ public class Main extends Application {
 			}
 		});
 
-		root.getChildren().addAll(new Label("Välj Starttyp:"), startTypeComboBox, generateButton,
-				new Label("Sök placering med startnummer:"), startNumberInput, showSplitsButton, pursuitBox,
-				new Label(""), statusArea, new Label("Genererade Starttider:"), resultArea, loadPreviousResultsButton);
+		root.getChildren().addAll(new Label("Välj Starttyp:"), startTypeComboBox, trackLengthInput, splitPointsInput,
+				raceSpeedFactorInput, generateButton, new Label("Sök placering med startnummer:"), startNumberInput,
+				showSplitsButton, pursuitBox, new Label("Status:"), statusArea, new Label("Mellantider:"), splitArea,
+				new Label("Genererade Starttider:"), resultArea, loadPreviousResultsButton);
 
 		Scene scene = new Scene(root, 450, 600);
 		primaryStage.setTitle("Starttidshantering");

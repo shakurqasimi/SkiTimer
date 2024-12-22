@@ -121,10 +121,14 @@ public class Skier implements Serializable {
 	}
 
 	public void move(long currentTime) {
-		double deltaTime = currentTime - startTime;
+		double deltaTime = (double) currentTime - startTime;
 		if (currentTime >= startTime && !hasFinished) {
 			position = speed * deltaTime / 1000;
 			previousTime = currentTime;
+		}
+		if (position >= SkiTrack.getTrackLength()) {
+			position = SkiTrack.getTrackLength(); //fusk för exakt resultat
+			hasFinished = true;
 		}
 		// if satsen säkerställer att åkaren bara kan röra sig om de har startat och
 		// inte gått i mål
