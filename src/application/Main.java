@@ -48,7 +48,7 @@ public class Main extends Application {
 		splitArea.setEditable(false);
 		VBox.setVgrow(splitArea, Priority.ALWAYS);
 		resultArea.setEditable(false);
-		resultArea.setPrefHeight(150);
+		resultArea.setPrefHeight(500);
 
 		TextField startNumberInput = new TextField();
 		startNumberInput.setPromptText("Ange Åkarnummer");
@@ -106,7 +106,6 @@ public class Main extends Application {
 					race.resetRace();
 					statusArea.clear();
 					splitArea.clear();
-					result.clearResults();
 					race = null;
 				}
 
@@ -114,10 +113,10 @@ public class Main extends Application {
 					race.resetRace();
 					statusArea.clear();
 					splitArea.clear();
-					result.clearResults();
 					race = null;
 				} else {
 					if (selectedType != Start.StartType.PURSUIT_START) {
+						result.clearResults();
 						start = new Start(selectedType, skiers);
 						List<String> startTimes = start.getFormattedStartTimes(skiers);
 						resultArea.setText(String.join("\n", startTimes));
@@ -128,6 +127,7 @@ public class Main extends Application {
 					}
 
 					if (selectedType == Start.StartType.PURSUIT_START) {
+						result.clearResults();
 						start = new Start(selectedType, previousSkiers);
 						List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
 						resultArea.setText(String.join("\n", startTimes));
@@ -219,7 +219,7 @@ public class Main extends Application {
 						Map.Entry<Integer, Long> entry = splitTimesStartNum.get(j);
 						splitArea.appendText("___________________________" + "\n ");
 						splitArea.appendText(
-								"Åkare " + splitTimesStartNum.get(j).getKey() + " har åktid " + result.formatTime(entry.getValue()) + " och placering: " + place + "\n ");
+								"Åkare " + splitTimesStartNum.get(j).getKey() + " har åktid " + result.formatTime(entry.getValue()) + " och plats: " + place + "\n ");
 						break;
 					}
 
@@ -248,7 +248,7 @@ public class Main extends Application {
 
 		sp.getItems().addAll(leftBox, rightBox);
 		sp.setDividerPositions(0.4);
-		Scene scene = new Scene(sp, 700, 600);
+		Scene scene = new Scene(sp, 1000, 800);
 
 		primaryStage.setTitle("Starttidshantering");
 		primaryStage.setScene(scene);

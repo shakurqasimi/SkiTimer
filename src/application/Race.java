@@ -74,13 +74,15 @@ public class Race extends Task<Void> {
 				for (Skier skier : skiers) {
 
 					long currentTime = timeSimulator.generateTime();
-					if (!skier.hasFinished()) {
-						skier.setSpeed(SpeedSimulator.generateSpeed());
-					}
+
 					skier.move(currentTime);
 					skier.setRaceTime(currentTime);
 					result.checkSplitPoints(skier);
 					result.checkFinishLine(skier);
+					if (!skier.hasFinished()) {
+						skier.setSpeed(SpeedSimulator.generateSpeed(skier.getSkierNumber()));
+					}
+					
 					// Här läggs bakgrundsuppdateringar under körningen (setters)
 					// updaterar åkarnas position beroende på passerad tid sedan start
 
@@ -108,6 +110,7 @@ public class Race extends Task<Void> {
 				statusArea.clear();
 				if (!raceFinished) {
 					for (Skier skier : skiers) {
+
 
 						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: "
 								+ skier.getStartNumber() + " har åkt " + df.format(skier.getPosition())

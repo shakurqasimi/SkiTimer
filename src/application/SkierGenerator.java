@@ -17,7 +17,7 @@ public class SkierGenerator {
         List<Skier> skiers = new ArrayList<>();
 
         for (int i = 1; i <= count; i++) {
-            skiers.add(new Skier(i, i, SpeedSimulator.generateSpeed()));
+            skiers.add(new Skier(i, i, SpeedSimulator.generateSpeed(1)));
         }
         return skiers;
     }

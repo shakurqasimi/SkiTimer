@@ -27,10 +27,10 @@ public class Skier implements Serializable {
 		this.skierNumber = skierNumber;
 		this.startNumber = startnumber;
 		this.speed = speed;
-		this.passedSplitPoints = new ArrayList<>(track.getSplitPoints().size());
+		this.passedSplitPoints = new ArrayList<>(SkiTrack.getSplitPoints().size());
 		this.hasFinished = false;
 
-		for (int i = 0; i < track.getSplitPoints().size(); i++) {
+		for (int i = 0; i < SkiTrack.getSplitPoints().size(); i++) {
 			passedSplitPoints.add(false);
 		}
 	}
@@ -125,9 +125,10 @@ public class Skier implements Serializable {
 			position = speed * deltaTime / 1000;
 			previousTime = currentTime;
 		}
-		if (position >= SkiTrack.getTrackLength()) {
+		if (position >= SkiTrack.getTrackLength() && !hasFinished) {
 			position = SkiTrack.getTrackLength(); //fusk för exakt resultat
 			hasFinished = true;
+			raceTime = currentTime;
 		}
 		// if satsen säkerställer att åkaren bara kan röra sig om de har startat och
 		// inte gått i mål

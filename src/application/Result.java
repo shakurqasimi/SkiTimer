@@ -129,13 +129,14 @@ public class Result {
 	public void checkSplitPoints(Skier skier) {
 		List<Boolean> passedSplitPoints = skier.getPassedSplitPoints();
 		for (int i = 0; i < SkiTrack.getSplitPoints().size(); i++) {
-			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
+			if (!passedSplitPoints.get(i) && skier.getPosition() >= SkiTrack.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
 				registerSplitTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime(),
 						SkiTrack.getSplitPoint(i));
 			}
 		}
 	}
+
 
 	public List<Map.Entry<Integer, Long>> getSortedSplitTimes() {
 		return splitTimesStartNum.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
