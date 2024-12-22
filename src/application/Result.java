@@ -106,11 +106,11 @@ public class Result {
 
 	public void displayFinalResults(List<Skier> skiers) {
 		System.out.println("Slutresultat (sorterat efter sluttid):");
-		resultArea.appendText("\n " + "Slutresultat (sorterat efter sluttid):"+ "\n ");
+		statusArea.appendText("\n " + "Slutresultat (sorterat efter sluttid):"+ "\n ");
 		for (Skier skier : skiers) {
 			System.out.println("Åkarnum: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()
 					+ ", åktid: " + formatTime(skier.getRaceTime()));
-			resultArea.appendText("Åkarnum: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()
+			statusArea.appendText("Åkarnum: " + skier.getSkierNumber() + ", startnum: " + skier.getStartNumber()
 					+ ", åktid: " + formatTime(skier.getRaceTime())+ "\n ");
 		}
 
@@ -128,11 +128,11 @@ public class Result {
 
 	public void checkSplitPoints(Skier skier) {
 		List<Boolean> passedSplitPoints = skier.getPassedSplitPoints();
-		for (int i = 0; i < track.getSplitPoints().size(); i++) {
+		for (int i = 0; i < SkiTrack.getSplitPoints().size(); i++) {
 			if (!passedSplitPoints.get(i) && skier.getPosition() >= track.getSplitPoints().get(i)) {
 				passedSplitPoints.set(i, true);
 				registerSplitTime(skier.getSkierNumber(), skier.getStartNumber(), skier.getRaceTime(),
-						track.getSplitPoint(i));
+						SkiTrack.getSplitPoint(i));
 			}
 		}
 	}

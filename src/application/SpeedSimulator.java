@@ -1,13 +1,12 @@
 package application;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SpeedSimulator {
 	
 	public static double generateSpeed() {
 		double trackLength = SkiTrack.getTrackLength();
 
-		Random random = new Random();
 		double maxSpeed = 0;
 		double minSpeed = 0;
 
@@ -23,8 +22,10 @@ public class SpeedSimulator {
 		 * ökar inte hastighetsavtagandet, vilket speglar hur atleters hastighet planar ut efter en viss längd och
 		 * undviker att hastigheten kan bli negativ vid tillräckligt långa längder
 		 */
-		
-		double speed = minSpeed + (maxSpeed - minSpeed) * random.nextDouble();
+	    double speed = ThreadLocalRandom.current().nextDouble(minSpeed, maxSpeed);
+	    double noise = ThreadLocalRandom.current().nextDouble(-1.00, 1.00); //ger mer variation i hastigheter
+	    speed += noise;
+
 
 		double speedMperS = convertSpeed(speed);
 		return speedMperS;

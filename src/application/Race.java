@@ -54,7 +54,6 @@ public class Race extends Task<Void> {
 
 	public void resetRace() {
 
-
 		for (Skier skier : skiers) {
 			skier.resetSkier();
 		}
@@ -75,6 +74,9 @@ public class Race extends Task<Void> {
 				for (Skier skier : skiers) {
 
 					long currentTime = timeSimulator.generateTime();
+					if (!skier.hasFinished()) {
+						skier.setSpeed(SpeedSimulator.generateSpeed());
+					}
 					skier.move(currentTime);
 					skier.setRaceTime(currentTime);
 					result.checkSplitPoints(skier);
@@ -85,10 +87,11 @@ public class Race extends Task<Void> {
 				}
 				if (skiers.stream().allMatch(Skier::hasFinished)) {
 					// när alla är klara sorteras resultatet för serialisering
+					
+					
 					raceFinishTime = timeSimulator.generateTime();
 					skiers.sort((skier1, skier2) -> Long.compare(skier1.getRaceTime(), skier2.getRaceTime()));
 					Serialization.serialize(skiers, "result.txt");
-					result.displayFinalResults(skiers);
 					raceFinished = true;
 					updateRaceFuture.cancel(false);
 
@@ -101,13 +104,11 @@ public class Race extends Task<Void> {
 
 			Platform.runLater(() -> {
 				// Här skickas UI uppdateringar under körningen (getters)
-			
 
-					statusArea.clear();
+				statusArea.clear();
+				if (!raceFinished) {
 					for (Skier skier : skiers) {
-						if (!skier.hasFinished()) {
-							skier.setSpeed(SpeedSimulator.generateSpeed());
-							}
+
 						String updateMessage = "Åkare: " + skier.getSkierNumber() + ", startnum: "
 								+ skier.getStartNumber() + " har åkt " + df.format(skier.getPosition())
 								+ " meter och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()) + "\n";
@@ -116,14 +117,17 @@ public class Race extends Task<Void> {
 								+ df.format(skier.getPosition()) + " meter");
 						System.out.println(" och har åktiden: " + timeSimulator.formatTime(skier.getRaceTime()));
 					}
-			
+				}
+
 				if (raceFinished) {
+					result.displayFinalResults(skiers);
 					statusArea.appendText(
 							"LOPPET AVSLUTAT EFTER " + timeSimulator.formatTime(raceFinishTime - raceStartTime) + "\n");
 					resetRace();
 				}
 			});
 		};
+
 		updateRaceFuture = scheduler.scheduleAtFixedRate(updateRace, 0, 16, TimeUnit.MILLISECONDS);
 		printRaceFuture = scheduler.scheduleAtFixedRate(printRace, 0, 1, TimeUnit.SECONDS);
 

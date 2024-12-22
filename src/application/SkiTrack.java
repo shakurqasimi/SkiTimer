@@ -39,7 +39,7 @@ public class SkiTrack {
 		return splitPoints;
 	}
 	
-	public Double getSplitPoint(int index) {
+	public static Double getSplitPoint(int index) {
 		return splitPoints.get(index);
 	}
 }
