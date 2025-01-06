@@ -23,7 +23,7 @@ public class SpeedSimulator {
 			minSpeed = 30 - (50 / 1000 * 2.4);
 		}
 		
-		double speed = minSpeed + (maxSpeed - minSpeed) * random.nextDouble() + variation;
+		double speed = minSpeed + (maxSpeed - minSpeed) + random.nextDouble() + variation;
 
 		double speedMperS = convertSpeed(speed);
 		return speedMperS;
