@@ -128,7 +128,6 @@ public class Skier implements Serializable {
 		if (position >= SkiTrack.getTrackLength() && !hasFinished) {
 			position = SkiTrack.getTrackLength(); //fusk för exakt resultat
 			hasFinished = true;
-			raceTime = currentTime;
 		}
 		// if satsen säkerställer att åkaren bara kan röra sig om de har startat och
 		// inte gått i mål
