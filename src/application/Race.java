@@ -46,12 +46,6 @@ public class Race extends Task<Void> {
 		return raceFinished;
 	}
 
-	public void InitializeRace(List<Skier> skiers, double speedFactor, Result result) {
-		this.skiers = skiers;
-		this.timeSimulator = new TimeSimulator(speedFactor);
-		this.result = result;
-	}
-
 	public void resetRace() {
 
 		for (Skier skier : skiers) {
