@@ -122,7 +122,6 @@ public class Main extends Application {
 						resultArea.setText(String.join("\n", startTimes));
 
 						race = new Race(skiers, raceSpeedFactor, result, statusArea);
-						race.InitializeRace(skiers, raceSpeedFactor, result);
 						new Thread(race).start();
 					}
 
@@ -132,7 +131,6 @@ public class Main extends Application {
 						List<String> startTimes = start.getFormattedStartTimes(previousSkiers);
 						resultArea.setText(String.join("\n", startTimes));
 						race = new Race(previousSkiers, raceSpeedFactor, result, statusArea);
-						race.InitializeRace(previousSkiers, raceSpeedFactor, result);
 						new Thread(race).start();
 					}
 				}
