@@ -166,37 +166,6 @@ public class Main extends Application {
 			}
 		});
 
-		Button fetchSkierButton = new Button("Hämta Åkare");
-		fetchSkierButton.setOnAction(event -> {
-			try {
-				int skierNumber = Integer.parseInt(startNumberInput.getText().trim());
-				previousSkiers = Serialization.deserialize("result.txt");
-
-				if (previousSkiers != null && !previousSkiers.isEmpty()) {
-					previousSkiers.sort((a, b) -> Double.compare(a.getRaceTime(), b.getRaceTime()));
-
-					Skier foundSkier = previousSkiers.stream().filter(skier -> skier.getSkierNumber() == skierNumber)
-							.findFirst().orElse(null);
-
-					if (foundSkier != null) {
-						int place = previousSkiers.indexOf(foundSkier) + 1;
-						String skierResult = "Åkare " + foundSkier.getSkierNumber() + ":\n" + "Tid: "
-								+ df.format(foundSkier.getRaceTime() / 1000.0) + " Position: "
-								+ df.format(foundSkier.getPosition()) + " meter" + "Plats: " + place + "\n";
-						resultArea.setText(skierResult);
-					} else {
-						resultArea.setText("Ingen åkare hittades med nummer " + skierNumber);
-					}
-				} else {
-					resultArea.setText("Inga tidigare resultat att söka i.");
-				}
-			} catch (NumberFormatException e) {
-				resultArea.setText("Felaktigt åkarnummer. Ange ett giltigt heltal.");
-			} catch (Exception e) {
-				resultArea.setText("Fel vid hämtning av åkare: " + e.getMessage());
-			}
-		});
-
 		Button showSplitsButton = new Button("Visa Mellantider");
 		showSplitsButton.setOnAction(event -> {
 			try {
