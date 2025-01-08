@@ -76,12 +76,13 @@ public class Result {
 	}
 
 	public String formatTime(long milliseconds) {
-		Duration duration = Duration.ofMillis(milliseconds);
-		long minutes = duration.toMinutes();
-		long seconds = duration.getSeconds() % 60;
-		long millis = duration.toMillisPart();
-		return String.format("%02d:%02d.%03d", minutes, seconds, millis);
-	}
+        Duration duration = Duration.ofMillis(milliseconds);
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+        long seconds = duration.toSecondsPart();
+        long millis = duration.toMillisPart();
+        return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, millis);
+    }
 
 	public void displayResults() {
 		StringBuilder sb = new StringBuilder();
